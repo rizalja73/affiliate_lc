@@ -30,9 +30,9 @@ export default function Header() {
 
           <nav className="hidden lg:flex items-center gap-10">
             {['Keuntungan', 'Cara Kerja', 'Penghasilan', 'Testimoni', 'FAQ'].map((item) => (
-              <a 
+              <a
                 key={item}
-                href={`#${item.toLowerCase().replace(' ', '-')}`} 
+                href={`#${item.toLowerCase().replace(' ', '-')}`}
                 className="text-gray-600 hover:text-primary-600 font-bold text-sm transition-all hover:scale-105"
               >
                 {item}
@@ -41,11 +41,11 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-             <Button variant="outline" size="sm" className="hidden xl:flex border-2 font-black">
-              Login Member
+            <Button variant="outline" size="sm" className="hidden xl:flex border-2 font-black">
+              Login Affiliate
             </Button>
             <Button size="sm" className="font-black shadow-xl shadow-primary-100">
-              Mulai Sekarang
+              Daftar Affiliate
               <Rocket className="ml-2 w-4 h-4" />
             </Button>
           </div>
@@ -63,9 +63,9 @@ export default function Header() {
       <div className={`lg:hidden absolute top-full left-0 right-0 bg-white shadow-2xl transition-all duration-300 transform ${isMenuOpen ? 'translate-y-0 opacity-100 visible' : '-translate-y-4 opacity-0 invisible'}`}>
         <div className="p-6 space-y-4">
           {['Keuntungan', 'Cara Kerja', 'Penghasilan', 'Testimoni', 'FAQ'].map((item) => (
-            <a 
+            <a
               key={item}
-              href={`#${item.toLowerCase().replace(' ', '-')}`} 
+              href={`#${item.toLowerCase().replace(' ', '-')}`}
               onClick={() => setIsMenuOpen(false)}
               className="block py-4 text-gray-900 font-bold border-b border-gray-50 hover:text-primary-600"
             >
