@@ -1,3 +1,4 @@
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HeroSection from './sections/HeroSection';
@@ -8,10 +9,12 @@ import SiapaCocokSection from './sections/SiapaCocokSection';
 import TestimoniSection from './sections/TestimoniSection';
 import FAQSection from './sections/FAQSection';
 import FinalCTASection from './sections/FinalCTASection';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
-function App() {
+function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <Header />
       <main>
         <div id="home">
@@ -38,6 +41,18 @@ function App() {
         <FinalCTASection />
       </main>
       <Footer />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+      </Routes>
     </div>
   );
 }

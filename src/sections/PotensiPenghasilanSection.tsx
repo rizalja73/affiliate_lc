@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TrendingUp, Target, Coins, Calculator, ArrowUpRight } from 'lucide-react';
 import Card from '../components/Card';
 import Section from '../components/Section';
+import Button from '../components/Button';
 
 function AnimatedNumber({ end, duration = 2000 }: { end: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -31,6 +33,7 @@ function AnimatedNumber({ end, duration = 2000 }: { end: number; duration?: numb
 }
 
 export default function PotensiPenghasilanSection() {
+  const navigate = useNavigate();
   const [sales, setSales] = useState(30);
   const commissionPerSale = 100000;
 
@@ -135,9 +138,15 @@ export default function PotensiPenghasilanSection() {
                       <p className="text-sm text-primary-100 font-medium opacity-80">Tingkatkan sales Anda untuk komisi yang lebih besar.</p>
                     </div>
                   </div>
-                  <button className="w-full py-6 bg-white text-primary-900 font-black text-2xl rounded-2xl shadow-2xl hover:bg-gray-100 transition-all duration-300 transform active:scale-95">
-                    GABUNG SEKARANG
-                  </button>
+                  <Button 
+                    variant="white" 
+                    size="xl" 
+                    rounded="full" 
+                    className="w-full"
+                    onClick={() => navigate('/register')}
+                  >
+                    Gabung Sekarang
+                  </Button>
                 </div>
               </div>
             </div>

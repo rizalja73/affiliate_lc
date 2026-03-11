@@ -1,7 +1,11 @@
 import { Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Section from '../components/Section';
+import Button from '../components/Button';
 
 export default function FinalCTASection() {
+  const navigate = useNavigate();
+
   return (
     <Section background="gradient" className="py-20 md:py-32 relative overflow-hidden">
       {/* Dynamic Red Background Elements */}
@@ -26,12 +30,18 @@ export default function FinalCTASection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-          <button className="px-14 py-7 bg-white text-primary-900 hover:bg-gray-100 text-2xl font-black rounded-[2rem] shadow-2xl hover:scale-105 transition-all w-full sm:w-auto group border-none flex items-center justify-center">
-            DAFTAR SEKARANG
+          <Button 
+            variant="white" 
+            size="xl" 
+            rounded="full" 
+            className="w-full sm:w-auto min-w-[280px] group border-none"
+            onClick={() => navigate('/register')}
+          >
+            Daftar Sekarang
             <ArrowRight className="ml-4 w-8 h-8 group-hover:translate-x-2 transition-transform" />
-          </button>
+          </Button>
           
-          <div className="flex items-center gap-4 text-white font-black bg-white/10 px-8 py-5 rounded-[2rem] border border-white/20 backdrop-blur-md">
+          <div className="flex items-center gap-4 text-white font-black bg-white/10 px-8 py-5 rounded-full border border-white/20 backdrop-blur-md">
             <ShieldCheck className="w-7 h-7 text-white" />
             <span className="uppercase tracking-widest text-sm">100% Free & Verified</span>
           </div>

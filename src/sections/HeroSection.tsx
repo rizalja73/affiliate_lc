@@ -1,8 +1,11 @@
 import { TrendingUp, ShieldCheck, Rocket, Star, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import Section from '../components/Section';
 
 export default function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <Section background="gradient" className="pt-24 pb-20 md:pt-40 md:pb-32 overflow-hidden relative text-center">
       {/* Dynamic Red Background Blobs */}
@@ -25,12 +28,26 @@ export default function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-          <Button size="xl" className="group shadow-2xl shadow-primary-200 w-full sm:w-auto">
-            DAFTAR SEKARANG
+          <Button 
+            size="xl" 
+            rounded="full" 
+            className="group shadow-2xl shadow-primary-200 w-full sm:w-auto min-w-[240px]"
+            onClick={() => navigate('/register')}
+          >
+            Daftar Sekarang
             <Rocket className="ml-3 w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </Button>
-          <Button size="xl" variant="outline" className="w-full sm:w-auto border-2 font-black">
-            PELAJARI POTENSI CUAN
+          <Button 
+            size="xl" 
+            variant="outline" 
+            rounded="full" 
+            className="w-full sm:w-auto min-w-[240px] border-2 font-black"
+            onClick={() => {
+              const element = document.getElementById('penghasilan');
+              if (element) element.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            Pelajari Potensi Cuan
           </Button>
         </div>
 
