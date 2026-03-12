@@ -12,7 +12,8 @@ import {
   Users,
   Award,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
@@ -20,6 +21,7 @@ import { useState } from 'react';
 export default function DashboardPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'ringkasan' | 'komisi'>('ringkasan');
+  const [activeTimeFilter, setActiveTimeFilter] = useState<'hari-ini' | 'kemarin' | '7-hari' | 'custom'>('hari-ini');
 
   const stats = {
     ringkasan: [
@@ -43,7 +45,7 @@ export default function DashboardPage() {
       description: 'Lihat katalog produk digital & fisik yang bisa Anda promosikan.',
       color: 'bg-blue-500',
       shadow: 'shadow-blue-200',
-      link: '#products'
+      link: '/products'
     },
     {
       title: 'Cek Pendapatan',
@@ -51,7 +53,7 @@ export default function DashboardPage() {
       description: 'Pantau saldo komisi dan atur rekening pencairan dana Anda.',
       color: 'bg-emerald-500',
       shadow: 'shadow-emerald-200',
-      link: '#earnings'
+      link: '/earnings'
     },
     {
       title: 'Lihat Data Penjualan',
@@ -59,7 +61,7 @@ export default function DashboardPage() {
       description: 'Analisis performa link affiliate dan statistik penjualan harian.',
       color: 'bg-purple-500',
       shadow: 'shadow-purple-200',
-      link: '#sales'
+      link: '/sales'
     },
     {
       title: 'Bahan Marketing',
@@ -67,7 +69,7 @@ export default function DashboardPage() {
       description: 'Download banner, copywriting, dan konten promosi siap pakai.',
       color: 'bg-orange-500',
       shadow: 'shadow-orange-200',
-      link: '#marketing'
+      link: '/marketing'
     }
   ];
 
@@ -94,10 +96,10 @@ export default function DashboardPage() {
             Dashboard
           </a>
           {menuItems.map((item, idx) => (
-            <a key={idx} href={item.link} className="flex items-center gap-3 px-4 py-3.5 text-gray-500 hover:bg-gray-50 hover:text-primary-600 rounded-2xl font-bold transition-all">
+            <Link key={idx} to={item.link} className="flex items-center gap-3 px-4 py-3.5 text-gray-500 hover:bg-gray-50 hover:text-primary-600 rounded-2xl font-bold transition-all">
               {item.icon}
               <span className="text-sm">{item.title}</span>
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -157,7 +159,7 @@ export default function DashboardPage() {
           {/* Welcome Section */}
           <section className="relative overflow-hidden bg-primary-600 rounded-[2.5rem] p-8 lg:p-12 text-white shadow-2xl shadow-primary-200">
             <div className="relative z-10 space-y-10">
-              <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div className="grid lg:grid-cols-2 gap-8 items-start">
                 <div className="space-y-6">
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold border border-white/20">
                     <TrendingUp className="w-4 h-4" />
@@ -172,18 +174,37 @@ export default function DashboardPage() {
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-6">
-                  {/* Tab Buttons */}
-                  <div className="flex p-1.5 bg-white/10 backdrop-blur-md rounded-2xl w-fit border border-white/10 self-end">
+                <div className="flex flex-col gap-4 lg:items-end">
+                  {/* Time Filters - Premium Pill Style */}
+                  <div className="flex flex-wrap p-1.5 bg-white/10 backdrop-blur-md rounded-2xl w-fit border border-white/10 shadow-inner">
+                    {[
+                      { id: 'hari-ini', label: 'Hari Ini' },
+                      { id: 'kemarin', label: 'Kemarin' },
+                      { id: '7-hari', label: '7 Hari' },
+                      { id: 'custom', label: 'Custom', icon: <Calendar className="w-3.5 h-3.5" /> }
+                    ].map((filter) => (
+                      <button
+                        key={filter.id}
+                        onClick={() => setActiveTimeFilter(filter.id as any)}
+                        className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 flex items-center gap-2 group ${activeTimeFilter === filter.id ? 'bg-white text-primary-600 shadow-[0_8px_20px_rgba(255,255,255,0.2)] scale-105' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
+                      >
+                        {filter.icon && <span className={activeTimeFilter === filter.id ? 'text-primary-500' : 'text-white/40 group-hover:text-white/60'}>{filter.icon}</span>}
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Tab Buttons - Segmented Control Style */}
+                  <div className="flex p-1.5 bg-black/10 backdrop-blur-md rounded-2xl w-fit border border-white/5 shadow-inner self-end lg:self-auto">
                     <button
                       onClick={() => setActiveTab('ringkasan')}
-                      className={`px-8 py-2.5 rounded-xl text-sm font-black transition-all ${activeTab === 'ringkasan' ? 'bg-white text-primary-600 shadow-lg' : 'text-white hover:bg-white/5'}`}
+                      className={`px-8 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${activeTab === 'ringkasan' ? 'bg-white text-primary-600 shadow-lg scale-105' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
                     >
                       Ringkasan
                     </button>
                     <button
                       onClick={() => setActiveTab('komisi')}
-                      className={`px-8 py-2.5 rounded-xl text-sm font-black transition-all ${activeTab === 'komisi' ? 'bg-white text-primary-600 shadow-lg' : 'text-white hover:bg-white/5'}`}
+                      className={`px-8 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${activeTab === 'komisi' ? 'bg-white text-primary-600 shadow-lg scale-105' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
                     >
                       Komisi
                     </button>
@@ -192,7 +213,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Stats Highlights Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in" key={activeTab}>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in" key={`${activeTab}-${activeTimeFilter}`}>
                 {stats[activeTab].map((stat, i) => (
                   <div key={i} className="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/10 group hover:bg-white/20 transition-all cursor-default relative overflow-hidden">
                     <div className="text-primary-100 text-[10px] font-black uppercase tracking-[0.2em] mb-3 opacity-80 group-hover:opacity-100 transition-opacity">{stat.label}</div>
@@ -220,9 +241,9 @@ export default function DashboardPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {menuItems.map((item, idx) => (
-                <a
+                <Link
                   key={idx}
-                  href={item.link}
+                  to={item.link}
                   className="group relative bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-gray-200/50 transition-all overflow-hidden"
                 >
                   <div className={`${item.color} w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform shadow-xl ${item.shadow}`}>
@@ -237,7 +258,7 @@ export default function DashboardPage() {
                   <div className="flex items-center text-xs font-black uppercase tracking-widest text-primary-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     Buka Menu <ArrowLeft className="w-3 h-3 rotate-180" />
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           </section>

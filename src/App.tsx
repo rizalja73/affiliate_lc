@@ -12,6 +12,10 @@ import FinalCTASection from './sections/FinalCTASection';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import ProductsPage from './pages/ProductsPage';
+import EarningsPage from './pages/EarningsPage';
+import SalesDataPage from './pages/SalesDataPage';
+import MarketingMaterialsPage from './pages/MarketingMaterialsPage';
 
 function LandingPage() {
   return (
@@ -54,6 +58,10 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/earnings" element={<EarningsPage />} />
+        <Route path="/sales" element={<SalesDataPage />} />
+        <Route path="/marketing" element={<MarketingMaterialsPage />} />
       </Routes>
     </div>
   );
