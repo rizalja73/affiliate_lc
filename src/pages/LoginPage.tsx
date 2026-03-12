@@ -100,7 +100,15 @@ export default function LoginPage() {
                 <label htmlFor="remember" className="text-sm font-bold text-gray-600 cursor-pointer">Ingat saya</label>
               </div>
 
-              <Button size="xl" rounded="full" className="w-full shadow-2xl shadow-primary-200 group">
+              <Button 
+                size="xl" 
+                rounded="full" 
+                className="w-full shadow-2xl shadow-primary-200 group"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/dashboard');
+                }}
+              >
                 Masuk Sekarang
                 <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Button>
