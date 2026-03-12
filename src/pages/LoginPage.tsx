@@ -1,27 +1,40 @@
-import { GraduationCap, Mail, Lock, ArrowRight, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { GraduationCap, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-6 lg:p-12 relative overflow-hidden">
       {/* Abstract Background Blobs */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-50 rounded-full blur-[120px] -z-10 opacity-60 -translate-y-1/2 translate-x-1/2"></div>
       <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-red-50 rounded-full blur-[150px] -z-10 opacity-40 translate-y-1/2 -translate-x-1/2"></div>
 
-      <div className="max-w-6xl w-full grid lg:grid-cols-2 gap-12 items-center relative z-10">
-        
-        {/* Left Side: Branding & Welcome Message */}
-        <div className="hidden lg:block space-y-12">
+      <div className="max-w-6xl w-full relative z-10">
+        <div className="mb-10 flex items-center justify-between">
           <Link to="/" className="inline-flex items-center gap-4 group">
-            <div className="w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-200 group-hover:rotate-6 transition-transform">
-              <GraduationCap className="w-8 h-8 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-xl shadow-primary-200 group-hover:rotate-6 transition-transform">
+              <GraduationCap className="w-7 h-7 text-white" />
             </div>
-            <div>
-              <div className="text-3xl font-black text-gray-900 tracking-tight">Lampung <span className="text-primary-600">Cerdas</span></div>
-              <div className="text-xs uppercase tracking-[0.3em] font-black text-primary-500/80">Affiliate Elite</div>
+            <div className="hidden sm:block">
+              <div className="text-xl font-black text-gray-900 tracking-tight">Lampung <span className="text-primary-600">Cerdas</span></div>
+              <div className="text-[10px] uppercase tracking-widest font-black text-primary-500/80">Affiliate Elite</div>
             </div>
           </Link>
+          <button 
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-500 hover:text-primary-600 font-bold transition-colors bg-white px-5 py-2.5 rounded-full shadow-sm border border-gray-100"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Kembali</span>
+          </button>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Side: Branding & Welcome Message */}
+          <div className="hidden lg:block space-y-12">
 
           <div className="space-y-6">
             <h1 className="text-5xl font-black text-gray-900 leading-tight">
@@ -48,15 +61,8 @@ export default function LoginPage() {
         {/* Right Side: Login Form Card */}
         <div className="w-full max-w-md mx-auto">
           <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] p-10 md:p-12 relative overflow-hidden border border-gray-50">
-            {/* Header for Mobile */}
-            <div className="lg:hidden mb-10 text-center">
-               <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-primary-200">
-                  <GraduationCap className="w-8 h-8 text-white" />
-               </div>
-               <h2 className="text-2xl font-black text-gray-900">Login Affiliate</h2>
-            </div>
 
-            <div className="mb-10 lg:block hidden">
+            <div className="mb-10">
               <h2 className="text-3xl font-black text-gray-900 mb-2">Login Member</h2>
               <p className="text-gray-500 font-medium">Akses dashboard eksklusif Anda</p>
             </div>
@@ -108,12 +114,8 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Link to="/" className="mt-8 flex items-center justify-center gap-2 text-gray-400 hover:text-primary-600 font-bold transition-colors">
-            <Home className="w-4 h-4" />
-            <span className="text-sm">Kembali ke Beranda</span>
-          </Link>
         </div>
-
+      </div>
       </div>
     </div>
   );
