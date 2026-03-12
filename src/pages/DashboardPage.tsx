@@ -1,22 +1,21 @@
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Wallet, 
-  BarChart3, 
-  Image as ImageIcon, 
-  ArrowLeft, 
-  LogOut, 
-  Bell, 
-  Search, 
-  TrendingUp, 
-  Users, 
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Wallet,
+  BarChart3,
+  Image as ImageIcon,
+  ArrowLeft,
+  LogOut,
+  Bell,
+  Search,
+  TrendingUp,
+  Users,
   Award,
   ExternalLink,
   ChevronRight
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import Button from '../components/Button';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -103,7 +102,7 @@ export default function DashboardPage() {
         </nav>
 
         <div className="p-6 border-t border-gray-50">
-          <button 
+          <button
             onClick={() => navigate('/login')}
             className="flex items-center gap-3 px-4 py-3.5 w-full text-red-500 hover:bg-red-50 rounded-2xl font-bold transition-all"
           >
@@ -119,7 +118,7 @@ export default function DashboardPage() {
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-10 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => navigate(-1)}
                 className="flex items-center gap-2 text-gray-500 hover:text-primary-600 font-bold transition-colors bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm"
               >
@@ -135,7 +134,7 @@ export default function DashboardPage() {
                 <Search className="w-4 h-4 text-gray-400 mr-2" />
                 <input type="text" placeholder="Cari fitur..." className="bg-transparent text-sm outline-none w-full" />
               </div>
-              
+
               <button className="relative w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                 <Bell className="w-5 h-5 text-gray-600" />
                 <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
@@ -176,13 +175,13 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-6">
                   {/* Tab Buttons */}
                   <div className="flex p-1.5 bg-white/10 backdrop-blur-md rounded-2xl w-fit border border-white/10 self-end">
-                    <button 
+                    <button
                       onClick={() => setActiveTab('ringkasan')}
                       className={`px-8 py-2.5 rounded-xl text-sm font-black transition-all ${activeTab === 'ringkasan' ? 'bg-white text-primary-600 shadow-lg' : 'text-white hover:bg-white/5'}`}
                     >
                       Ringkasan
                     </button>
-                    <button 
+                    <button
                       onClick={() => setActiveTab('komisi')}
                       className={`px-8 py-2.5 rounded-xl text-sm font-black transition-all ${activeTab === 'komisi' ? 'bg-white text-primary-600 shadow-lg' : 'text-white hover:bg-white/5'}`}
                     >
@@ -191,7 +190,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Stats Highlights Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in" key={activeTab}>
                 {stats[activeTab].map((stat, i) => (
@@ -204,7 +203,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
-            
+
             {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-black opacity-10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
@@ -221,8 +220,8 @@ export default function DashboardPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {menuItems.map((item, idx) => (
-                <a 
-                  key={idx} 
+                <a
+                  key={idx}
                   href={item.link}
                   className="group relative bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-gray-200/50 transition-all overflow-hidden"
                 >
