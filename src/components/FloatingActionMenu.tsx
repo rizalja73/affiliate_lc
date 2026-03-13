@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Plus, 
   X, 
   ShoppingBag, 
   Wallet, 
@@ -87,7 +86,7 @@ export default function FloatingActionMenu() {
         {isOpen ? (
           <X className="w-8 h-8" />
         ) : (
-          <Plus className="w-8 h-8" />
+          <img src="/src/components/public/Logo LC.png" alt="LC" className="w-10 h-10 object-contain" />
         )}
       </button>
     </div>

@@ -80,8 +80,8 @@ export default function DashboardPage() {
       <aside className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-100 hidden xl:flex flex-col z-50">
         <div className="p-8">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-800 rounded-xl flex items-center justify-center shadow-lg shadow-primary-200">
-              <LayoutDashboard className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-primary-200 overflow-hidden">
+              <img src="/src/components/public/Logo LC.png" alt="Lampung Cerdas" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <div className="text-lg font-black text-gray-900 tracking-tight leading-none">Pusat <span className="text-primary-600">Affiliate</span></div>

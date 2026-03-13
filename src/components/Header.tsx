@@ -1,4 +1,4 @@
-import { GraduationCap, Menu, X, Rocket } from 'lucide-react';
+import { Menu, X, Rocket } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from './Button';
@@ -37,8 +37,8 @@ export default function Header() {
       <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 group cursor-pointer">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-200 transform group-hover:rotate-6 transition-transform">
-              <GraduationCap className="w-7 h-7 text-white" />
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary-200 transform group-hover:rotate-6 transition-transform overflow-hidden">
+              <img src="/src/components/public/Logo LC.png" alt="Lampung Cerdas" className="w-10 h-10 object-contain" />
             </div>
             <div>
               <div className="text-xl font-black text-gray-900 tracking-tight">Lampung <span className="text-primary-600">Cerdas</span></div>
