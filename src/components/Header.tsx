@@ -38,7 +38,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4 group cursor-pointer">
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-primary-200 transform group-hover:rotate-6 transition-transform overflow-hidden">
-              <img src="/src/components/public/Logo LC.png" alt="Lampung Cerdas" className="w-10 h-10 object-contain" />
+              <img src="/Logo LC.png" alt="Lampung Cerdas" className="w-10 h-10 object-contain" />
             </div>
             <div>
               <div className="text-xl font-black text-gray-900 tracking-tight">Lampung <span className="text-primary-600">Cerdas</span></div>

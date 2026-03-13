@@ -86,7 +86,7 @@ export default function FloatingActionMenu() {
         {isOpen ? (
           <X className="w-8 h-8" />
         ) : (
-          <img src="/src/components/public/Logo LC.png" alt="LC" className="w-10 h-10 object-contain" />
+          <img src="/Logo LC.png" alt="LC" className="w-10 h-10 object-contain" />
         )}
       </button>
     </div>

@@ -81,7 +81,7 @@ export default function DashboardPage() {
         <div className="p-8">
           <Link to="/" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-primary-200 overflow-hidden">
-              <img src="/src/components/public/Logo LC.png" alt="Lampung Cerdas" className="w-8 h-8 object-contain" />
+              <img src="/Logo LC.png" alt="Lampung Cerdas" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <div className="text-lg font-black text-gray-900 tracking-tight leading-none">Pusat <span className="text-primary-600">Affiliate</span></div>
