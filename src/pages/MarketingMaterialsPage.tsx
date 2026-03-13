@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
+import FloatingActionMenu from '../components/FloatingActionMenu';
 
 export default function MarketingMaterialsPage() {
   const navigate = useNavigate();
@@ -209,6 +210,7 @@ export default function MarketingMaterialsPage() {
             Dilarang keras menyebarkan tanpa izin tertulis.
           </p>
       </footer>
+      <FloatingActionMenu />
     </div>
   );
 }

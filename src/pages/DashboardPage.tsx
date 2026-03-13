@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import FloatingActionMenu from '../components/FloatingActionMenu';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -323,12 +324,8 @@ export default function DashboardPage() {
         </footer>
       </main>
 
-      {/* Floating Action Button for Mobile */}
-      <div className="fixed bottom-6 right-6 xl:hidden z-50">
-        <button className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white shadow-2xl shadow-primary-300">
-          <LayoutDashboard className="w-8 h-8" />
-        </button>
-      </div>
+      {/* Floating Action Menu for Mobile */}
+      <FloatingActionMenu />
     </div>
   );
 }

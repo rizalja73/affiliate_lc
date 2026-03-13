@@ -17,6 +17,7 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
+import FloatingActionMenu from '../components/FloatingActionMenu';
 
 export default function SalesDataPage() {
   const navigate = useNavigate();
@@ -233,6 +234,7 @@ export default function SalesDataPage() {
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3"></div>
          </div>
       </footer>
+      <FloatingActionMenu />
     </div>
   );
 }

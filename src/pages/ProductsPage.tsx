@@ -14,6 +14,7 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
+import FloatingActionMenu from '../components/FloatingActionMenu';
 
 export default function ProductsPage() {
   const navigate = useNavigate();
@@ -269,6 +270,7 @@ export default function ProductsPage() {
             <div className="absolute top-1/2 right-0 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-[60px]"></div>
          </div>
       </section>
+      <FloatingActionMenu />
     </div>
   );
 }

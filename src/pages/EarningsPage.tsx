@@ -15,6 +15,7 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
+import FloatingActionMenu from '../components/FloatingActionMenu';
 
 export default function EarningsPage() {
   const navigate = useNavigate();
@@ -213,6 +214,7 @@ export default function EarningsPage() {
             <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2"></div>
          </div>
       </footer>
+      <FloatingActionMenu />
     </div>
   );
 }
