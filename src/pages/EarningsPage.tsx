@@ -10,7 +10,8 @@ import {
   TrendingUp,
   CreditCard,
   History,
-  Info
+  Info,
+  Headphones
 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +21,7 @@ import FloatingActionMenu from '../components/FloatingActionMenu';
 export default function EarningsPage() {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<'semua' | 'tertunda' | 'terkirim' | 'batal'>('semua');
+  const [isCalling, setIsCalling] = useState(false);
 
   const transactions = [
     { id: 1, type: 'Komisi Penjualan', amount: 'Rp 150.000', status: 'terkirim', date: '12 Mar 2026', product: 'Kursus CPNS' },
@@ -208,9 +210,31 @@ export default function EarningsPage() {
                <h4 className="text-xl font-black mb-1">Butuh Bantuan Keuangan?</h4>
                <p className="text-blue-50/80 font-medium">Hubungi tim admin untuk pertanyaan seputar pencairan komisi.</p>
             </div>
-            <Button className="relative z-10 bg-white text-blue-600 border-white hover:bg-blue-50 font-black px-8 py-4 text-sm shadow-2xl">
-              Hubungi Helpdesk
-            </Button>
+            <button 
+               onClick={() => {
+                 setIsCalling(true);
+                 setTimeout(() => setIsCalling(false), 3000); 
+               }}
+               className={`relative z-10 font-black px-8 py-4 text-sm rounded-full shadow-2xl overflow-hidden transition-all duration-700 ease-out transform hover:-translate-y-1 active:scale-95 cursor-pointer ${
+                 isCalling 
+                   ? 'bg-gradient-to-r from-blue-300 to-cyan-300 text-blue-950 scale-105 shadow-[0_0_50px_rgba(56,189,248,0.6)] border border-blue-200' 
+                   : 'bg-white text-blue-600 hover:bg-blue-50 border border-white/20'
+               }`}
+            >
+              <div className="relative flex items-center justify-center min-w-[180px] h-6">
+                <span className={`absolute flex items-center justify-center gap-2 transition-all duration-500 ${
+                  isCalling ? 'opacity-0 translate-y-8 scale-75 blur-sm' : 'opacity-100 translate-y-0 scale-100 blur-0'
+                }`}>
+                  Hubungi Helpdesk
+                </span>
+                <span className={`absolute flex items-center justify-center gap-2 transition-all duration-500 delay-100 ${
+                  isCalling ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-0 -translate-y-8 scale-125 blur-sm'
+                }`}>
+                  <Headphones className="w-5 h-5 animate-pulse text-blue-900" />
+                  Menghubungkan...
+                </span>
+              </div>
+            </button>
             <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2"></div>
          </div>
       </footer>

@@ -19,6 +19,7 @@ import FloatingActionMenu from '../components/FloatingActionMenu';
 export default function ProductsPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'temukan' | 'kelola'>('temukan');
+  const [isUpgrading, setIsUpgrading] = useState(false);
 
   const products = [
     {
@@ -263,9 +264,31 @@ export default function ProductsPage() {
                   </div>
                </div>
             </div>
-            <Button className="relative z-10 bg-white text-emerald-600 border-white hover:bg-emerald-50 font-black px-8 py-4 text-sm shadow-2xl">
-              Upgrade Membership
-            </Button>
+            <button 
+               onClick={() => {
+                 setIsUpgrading(true);
+                 setTimeout(() => setIsUpgrading(false), 3000); // Reset for demonstration
+               }}
+               className={`relative z-10 font-black px-8 py-4 text-sm rounded-full shadow-2xl overflow-hidden transition-all duration-700 ease-out transform hover:-translate-y-1 active:scale-95 cursor-pointer ${
+                 isUpgrading 
+                   ? 'bg-gradient-to-r from-yellow-300 to-yellow-500 text-yellow-950 scale-105 shadow-[0_0_50px_rgba(250,204,21,0.6)] border border-yellow-200' 
+                   : 'bg-white text-emerald-600 hover:bg-emerald-50 border border-white/20'
+               }`}
+            >
+              <div className="relative flex items-center justify-center min-w-[200px] h-6">
+                <span className={`absolute flex items-center justify-center gap-2 transition-all duration-500 ${
+                  isUpgrading ? 'opacity-0 translate-y-8 scale-75 blur-sm' : 'opacity-100 translate-y-0 scale-100 blur-0'
+                }`}>
+                  Upgrade Membership
+                </span>
+                <span className={`absolute flex items-center justify-center gap-2 transition-all duration-500 delay-100 ${
+                  isUpgrading ? 'opacity-100 translate-y-0 scale-100 blur-0' : 'opacity-0 -translate-y-8 scale-125 blur-sm'
+                }`}>
+                  <Sparkles className="w-5 h-5 animate-spin-slow text-yellow-900" />
+                  Mengaktifkan VIP...
+                </span>
+              </div>
+            </button>
             {/* Background pattern */}
             <div className="absolute top-1/2 right-0 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-[60px]"></div>
          </div>

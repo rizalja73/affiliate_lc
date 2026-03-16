@@ -6,7 +6,8 @@ import {
   ShoppingBag, 
   Wallet, 
   BarChart3, 
-  Image as ImageIcon 
+  Image as ImageIcon,
+  Home
 } from 'lucide-react';
 
 export default function FloatingActionMenu() {
@@ -36,6 +37,13 @@ export default function FloatingActionMenu() {
       color: 'bg-gradient-to-tr from-emerald-600 to-emerald-400',
       shadow: 'shadow-emerald-500/40',
       path: '/earnings'
+    },
+    {
+      icon: <Home className="w-5 h-5" />,
+      label: 'Dashboard Utama',
+      color: 'bg-gradient-to-tr from-rose-600 to-rose-400',
+      shadow: 'shadow-rose-500/40',
+      path: '/dashboard'
     },
     {
       icon: <ShoppingBag className="w-5 h-5" />,

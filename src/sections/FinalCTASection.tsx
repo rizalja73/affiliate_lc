@@ -20,14 +20,21 @@ export default function FinalCTASection() {
           <span>Kesempatan Terbatas! Bergabung Sekarang</span>
         </div>
 
-        <h2 className="text-5xl md:text-8xl font-black text-white mb-8 leading-[1.1] tracking-tighter">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-red-500 mb-8 leading-tight tracking-wide">
           Siap Memulai <br />
-          <span className="text-white/40 italic">Masa Depan?</span>
+          <span className="font-black uppercase tracking-[0.2em] mt-3 block text-yellow-400">
+            Masa Depan?
+          </span>
         </h2>
 
-        <p className="text-xl md:text-2xl text-primary-100 mb-14 max-w-3xl mx-auto font-medium leading-relaxed opacity-90">
-          Ubah pengaruh Anda menjadi sumber penghasilan berkelanjutan. Bergabung dengan ekosistem affiliate Lampung Cerdas yang transparan dan bersahabat. 
-        </p>
+        <div className="max-w-3xl mx-auto mb-14">
+          <p className="text-base md:text-lg lg:text-xl text-red-500 font-normal leading-loose">
+            Ubah pengaruh Anda menjadi <span className="font-bold text-yellow-400">sumber penghasilan berkelanjutan</span>. 
+            <br className="hidden md:block mt-2"/>
+            Bergabung dengan ekosistem affiliate <strong className="font-black uppercase tracking-wider text-yellow-400 mx-1">Lampung Cerdas</strong> 
+            yang transparan dan bersahabat.
+          </p>
+        </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
           <Button 
@@ -47,7 +54,7 @@ export default function FinalCTASection() {
           </div>
         </div>
 
-        <div className="mt-20 pt-16 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-12">
+        <div className="mt-20 pt-16 border-t border-red-500/20 grid grid-cols-2 md:grid-cols-4 gap-12">
           {[
             { label: 'Total Affiliate', val: '1,200+' },
             { label: 'Komisi Terbayar', val: 'Rp 2M+' },
@@ -55,8 +62,8 @@ export default function FinalCTASection() {
             { label: 'CS Online', val: '24/7' },
           ].map((stat, i) => (
             <div key={i} className="text-center group">
-              <p className="text-4xl font-black text-white mb-2 group-hover:scale-110 transition-transform">{stat.val}</p>
-              <p className="text-xs font-black text-primary-200 uppercase tracking-widest opacity-60">{stat.label}</p>
+              <p className="text-4xl font-black text-red-500 mb-2 group-hover:scale-110 transition-transform">{stat.val}</p>
+              <p className="text-xs font-black text-red-500 uppercase tracking-widest">{stat.label}</p>
             </div>
           ))}
         </div>
