@@ -9,19 +9,14 @@
   <meta property="og:image" content="https://bolt.new/static/og_default.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://bolt.new/static/og_default.png" />
+
+  <!-- n8n Chat Widget Styles -->
+  <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 </head>
 
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-  <script type="module">
-    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
-
-    createChat({
-      webhookUrl: 'https://wabot-n8n.fbywp0.easypanel.host/webhook/7c0e5f40-ae16-4df6-8901-4d1309f49403/chat'
-    });
-  </script>
 </body>
 
 </html>
