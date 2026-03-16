@@ -55,6 +55,7 @@ function App() {
     <div className="min-h-screen bg-white">
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/affiliate" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
@@ -62,6 +63,8 @@ function App() {
         <Route path="/earnings" element={<EarningsPage />} />
         <Route path="/sales" element={<SalesDataPage />} />
         <Route path="/marketing" element={<MarketingMaterialsPage />} />
+        {/* Fallback route for 404 or unknown paths to redirect to home */}
+        <Route path="*" element={<LandingPage />} />
       </Routes>
     </div>
   );
