@@ -50,19 +50,27 @@ function LandingPage() {
   );
 }
 
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <div className="min-h-screen bg-white">
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/affiliate" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/earnings" element={<EarningsPage />} />
-        <Route path="/sales" element={<SalesDataPage />} />
-        <Route path="/marketing" element={<MarketingMaterialsPage />} />
+        
+        {/* Protected Dashboard Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/earnings" element={<EarningsPage />} />
+          <Route path="/sales" element={<SalesDataPage />} />
+          <Route path="/marketing" element={<MarketingMaterialsPage />} />
+        </Route>
+
         {/* Fallback route for 404 or unknown paths to redirect to home */}
         <Route path="*" element={<LandingPage />} />
       </Routes>

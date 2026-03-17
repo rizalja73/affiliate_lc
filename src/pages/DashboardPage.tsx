@@ -18,13 +18,25 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import FloatingActionMenu from '../components/FloatingActionMenu';
+import { useAuth } from '../hooks/useAuth';
+import { logoutAffiliate } from '../lib/auth';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'ringkasan' | 'komisi'>('ringkasan');
   const [activeTimeFilter, setActiveTimeFilter] = useState<'hari-ini' | 'kemarin' | '7-hari' | 'custom'>('hari-ini');
 
-  const stats = {
+  const handleLogout = async () => {
+    await logoutAffiliate();
+    navigate('/login');
+  };
+
+  const displayName = user?.user_metadata?.first_name 
+    ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
+    : user?.email?.split('@')[0] || 'Member';
+
+  const stats: Record<string, { label: string; value: string }[]> = {
     ringkasan: [
       { label: 'GMV Teratribusi', value: 'Rp 42.500.000' },
       { label: 'Produk Terjual Teratribusi', value: '156' },
@@ -106,7 +118,7 @@ export default function DashboardPage() {
 
         <div className="p-6 border-t border-gray-50">
           <button
-            onClick={() => navigate('/login')}
+            onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3.5 w-full text-red-500 hover:bg-red-50 rounded-2xl font-bold transition-all"
           >
             <LogOut className="w-5 h-5" />
@@ -145,11 +157,11 @@ export default function DashboardPage() {
 
               <div className="flex items-center gap-3 pl-3 md:pl-6 border-l border-gray-100">
                 <div className="text-right hidden sm:block">
-                  <div className="text-sm font-black text-gray-900">Budi Santoso</div>
+                  <div className="text-sm font-black text-gray-900">{displayName}</div>
                   <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Affiliate Pro</div>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center font-bold text-primary-700">
-                  BS
+                  {displayName.substring(0, 2).toUpperCase()}
                 </div>
               </div>
             </div>
@@ -167,7 +179,7 @@ export default function DashboardPage() {
                     Performa Anda naik 24% hari ini!
                   </div>
                   <h2 className="text-4xl lg:text-5xl font-black leading-tight">
-                    Halo, Budi! <br />
+                    Halo, {displayName.split(' ')[0]}! <br />
                     Siap raih <span className="text-primary-100">komisi besar?</span>
                   </h2>
                   <p className="text-primary-50/80 text-lg font-medium max-w-md">
