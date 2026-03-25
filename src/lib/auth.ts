@@ -110,6 +110,26 @@ export async function loginAffiliate(email: string, password: string): Promise<A
   }
 }
 
+export async function loginWithGoogle(): Promise<AuthResult> {
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+
+    if (error) {
+      return { success: false, message: translateError(error.message) };
+    }
+
+    return { success: true, message: 'Menghubungkan ke Google...' };
+  } catch (err) {
+    console.error('Google login error:', err);
+    return { success: false, message: 'Terjadi kesalahan saat login Google.' };
+  }
+}
+
 // ─── LOGOUT ───────────────────────────────────────────────────────────────────
 
 export async function logoutAffiliate(): Promise<void> {
