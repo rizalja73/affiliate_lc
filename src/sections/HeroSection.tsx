@@ -7,11 +7,17 @@ export default function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <Section background="gradient" className="pt-24 pb-20 md:pt-40 md:pb-32 overflow-hidden relative text-center">
-      {/* Dynamic Red Background Blobs */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-50 rounded-full blur-[120px] -z-10 opacity-70"></div>
-      <div className="absolute bottom-0 right-0 translate-y-1/2 translate-x-1/2 w-[400px] h-[400px] bg-primary-100 rounded-full blur-[100px] -z-10 opacity-40"></div>
-      
+    <Section background="transparent" className="pt-24 pb-20 md:pt-40 md:pb-32 overflow-hidden relative z-0 text-center bg-gradient-to-b from-white via-primary-50/50 to-white">
+      {/* Subtle Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_30%,#000_20%,transparent_100%)] -z-10"></div>
+
+      {/* Dynamic Light Background Blobs */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary-200 rounded-full blur-[120px] opacity-30 animate-float"></div>
+        <div className="absolute top-1/3 -right-32 w-[600px] h-[600px] bg-primary-200 rounded-full blur-[120px] opacity-40 animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-0 -left-32 w-[600px] h-[300px] bg-primary-300 rounded-full blur-[120px] opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+
       <div className="max-w-4xl mx-auto space-y-10 animate-fade-in relative z-10">
         <div className="inline-flex items-center gap-3 bg-white border-2 border-primary-100 text-primary-600 px-6 py-2.5 rounded-full text-sm font-black shadow-xl shadow-primary-50">
           <ShieldCheck className="w-5 h-5" />
@@ -28,19 +34,19 @@ export default function HeroSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-          <Button 
-            size="xl" 
-            rounded="full" 
+          <Button
+            size="xl"
+            rounded="full"
             className="group shadow-2xl shadow-primary-200 w-full sm:w-auto min-w-[240px]"
             onClick={() => navigate('/register')}
           >
             Daftar Sekarang
             <Rocket className="ml-3 w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
           </Button>
-          <Button 
-            size="xl" 
-            variant="outline" 
-            rounded="full" 
+          <Button
+            size="xl"
+            variant="outline"
+            rounded="full"
             className="w-full sm:w-auto min-w-[240px] border-2 font-black"
             onClick={() => {
               const element = document.getElementById('penghasilan');
@@ -61,7 +67,7 @@ export default function HeroSection() {
               <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Gratis Biaya</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-primary-600" />

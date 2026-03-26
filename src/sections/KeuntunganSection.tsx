@@ -7,7 +7,7 @@ const benefits = [
     icon: DollarSign,
     title: 'Komisi Tertinggi',
     description: 'Nikmati bagi hasil yang sangat kompetitif. Dapatkan pasif income yang stabil dari setiap closing yang Anda lakukan.',
-    color: 'from-primary-500 to-primary-700'
+    color: 'from-red-600 to-red-800'
   },
   {
     icon: Award,
@@ -19,13 +19,13 @@ const benefits = [
     icon: Zap,
     title: 'Pencairan Cepat',
     description: 'Tidak perlu menunggu lama. Komisi Anda akan diproses dan dicairkan secara berkala dengan sistem yang transparan.',
-    color: 'from-primary-400 to-primary-600'
+    color: 'from-red-600 to-red-800'
   },
   {
     icon: ShieldCheck,
     title: 'Support & Mentoring',
     description: 'Dapatkan akses ke materi promosi eksklusif dan bimbingan langsung dari tim expert kami hingga Anda mahir.',
-    color: 'from-gray-700 to-gray-900'
+    color: 'from-red-600 to-red-800'
   }
 ];
 
@@ -33,7 +33,7 @@ export default function KeuntunganSection() {
   return (
     <Section background="white" className="relative">
       <div className="absolute top-40 left-0 w-72 h-72 bg-primary-50 rounded-full blur-3xl -z-10 opacity-60"></div>
-      
+
       <div className="text-center mb-16">
         <div className="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest text-primary-700 uppercase bg-primary-100 rounded-full">
           Why Choose Us
@@ -55,7 +55,7 @@ export default function KeuntunganSection() {
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-4">{benefit.title}</h3>
             <p className="text-gray-600 leading-relaxed text-sm md:text-base">{benefit.description}</p>
-            
+
             {/* Subtle Gradient Overlay */}
             <div className={`absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br ${benefit.color} opacity-[0.03] rounded-tl-full`}></div>
           </Card>

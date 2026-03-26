@@ -6,13 +6,13 @@ const steps = [
     icon: UserPlus,
     title: 'Daftar Gratis',
     description: 'Isi formulir pendaftaran singkat dan langsung dapatkan akses ke dashboard affiliate Anda.',
-    color: 'bg-primary-500'
+    color: 'bg-red-700'
   },
   {
     icon: Share2,
     title: 'Promosikan',
     description: 'Gunakan link affiliate unik dan materi promosi siap pakai untuk dibagikan di media sosial.',
-    color: 'bg-primary-600'
+    color: 'bg-red-700'
   },
   {
     icon: Wallet,
@@ -24,7 +24,7 @@ const steps = [
     icon: Rocket,
     title: 'Scale Up',
     description: 'Tingkatkan performa Anda dengan mentoring eksklusif dan raih bonus pencapaian menarik.',
-    color: 'bg-red-800'
+    color: 'bg-red-700'
   }
 ];
 
@@ -32,7 +32,7 @@ export default function CaraKerjaSection() {
   return (
     <Section background="gradient" className="relative overflow-hidden">
       <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-primary-100 rounded-full blur-3xl opacity-50 -z-10"></div>
-      
+
       <div className="text-center mb-16 md:mb-24">
         <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-6">
           Langkah Mudah <span className="text-primary-600 italic">Mulai Cuan</span>
@@ -54,11 +54,11 @@ export default function CaraKerjaSection() {
                 <div className="absolute -top-4 -right-4 w-10 h-10 bg-white shadow-xl rounded-full flex items-center justify-center font-black text-primary-600 border-2 border-primary-50 z-20">
                   {index + 1}
                 </div>
-                
+
                 {/* Icon Container */}
                 <div className={`w-24 h-24 ${step.color} rounded-[2rem] flex items-center justify-center text-white shadow-2xl transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 relative`}>
                   <step.icon className="w-10 h-10" />
-                  
+
                   {/* Decorative Ring */}
                   <div className="absolute inset-0 border-4 border-white/20 rounded-[2rem] scale-90 group-hover:scale-100 transition-transform duration-500" />
                 </div>

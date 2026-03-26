@@ -35,12 +35,12 @@ function AnimatedNumber({ end, duration = 2000 }: { end: number; duration?: numb
 export default function PotensiPenghasilanSection() {
   const navigate = useNavigate();
   const [sales, setSales] = useState(30);
-  const commissionPerSale = 100000;
+  const commissionPerSale = 0.12;
 
   return (
     <Section background="white" className="relative">
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary-50 rounded-full blur-3xl -z-10 opacity-60"></div>
-      
+
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 text-xs font-bold text-primary-700 uppercase bg-primary-100 rounded-full">
           <Calculator className="w-3.5 h-3.5" />
@@ -77,8 +77,8 @@ export default function PotensiPenghasilanSection() {
                   <div>
                     <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Komisi Affiliate</p>
                     <div className="flex items-baseline gap-2 mt-1">
-                       <p className="text-3xl font-black text-primary-600 leading-none">20%</p>
-                       <span className="text-gray-400 font-bold text-xs uppercase tracking-tighter">per closing</span>
+                      <p className="text-3xl font-black text-primary-600 leading-none">12%</p>
+                      <span className="text-gray-400 font-bold text-xs uppercase tracking-tighter">per closing</span>
                     </div>
                   </div>
                 </div>
@@ -88,11 +88,11 @@ export default function PotensiPenghasilanSection() {
                     <label className="block text-sm font-black text-gray-900 mb-6 uppercase tracking-widest">
                       Target Sales: <span className="text-primary-600 text-3xl ml-3">{sales}</span>
                     </label>
-                    <input 
-                      type="range" 
-                      min="1" 
-                      max="100" 
-                      value={sales} 
+                    <input
+                      type="range"
+                      min="1"
+                      max="100"
+                      value={sales}
                       onChange={(e) => setSales(parseInt(e.target.value))}
                       className="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer accent-primary-600"
                     />
@@ -112,7 +112,7 @@ export default function PotensiPenghasilanSection() {
             <div className="h-full bg-gradient-to-br from-primary-600 via-primary-700 to-primary-950 rounded-[2.5rem] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden group">
               {/* Background Decoration */}
               <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:scale-125 transition-transform duration-700"></div>
-              
+
               <div className="relative z-10 flex flex-col h-full justify-between">
                 <div>
                   <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 text-xs font-black bg-white/20 rounded-full uppercase tracking-widest">
@@ -122,7 +122,7 @@ export default function PotensiPenghasilanSection() {
                   <h3 className="text-2xl font-bold mb-4 opacity-80">Total Pendapatan Anda:</h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl md:text-5xl lg:text-8xl font-black text-white drop-shadow-2xl">
-                      Rp <AnimatedNumber end={sales * commissionPerSale} />
+                      Rp <AnimatedNumber end={500000 * sales * commissionPerSale} />
                     </span>
                   </div>
                   <p className="mt-6 text-primary-100 font-bold text-lg">Berdasarkan {sales} penjualan per bulan.</p>
@@ -138,10 +138,10 @@ export default function PotensiPenghasilanSection() {
                       <p className="text-sm text-primary-100 font-medium opacity-80">Tingkatkan sales Anda untuk komisi yang lebih besar.</p>
                     </div>
                   </div>
-                  <Button 
-                    variant="white" 
-                    size="xl" 
-                    rounded="full" 
+                  <Button
+                    variant="white"
+                    size="xl"
+                    rounded="full"
                     className="w-full"
                     onClick={() => navigate('/register')}
                   >

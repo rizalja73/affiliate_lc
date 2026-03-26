@@ -1,14 +1,16 @@
 interface SectionProps {
   children: React.ReactNode;
   className?: string;
-  background?: 'white' | 'gray' | 'gradient';
+  background?: 'white' | 'gray' | 'gradient' | 'dark' | 'transparent';
 }
 
 export default function Section({ children, className = '', background = 'white' }: SectionProps) {
   const backgrounds = {
     white: 'bg-white',
     gray: 'bg-gray-50',
-    gradient: 'bg-gradient-to-br from-primary-50 via-white to-primary-50'
+    gradient: 'bg-gradient-to-br from-primary-50 via-white to-primary-50',
+    dark: 'bg-primary-900',
+    transparent: 'bg-transparent'
   };
 
   return (
