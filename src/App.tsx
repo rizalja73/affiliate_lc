@@ -16,6 +16,9 @@ import ProductsPage from './pages/ProductsPage';
 import EarningsPage from './pages/EarningsPage';
 import SalesDataPage from './pages/SalesDataPage';
 import MarketingMaterialsPage from './pages/MarketingMaterialsPage';
+import AcademyPage from './pages/AcademyPage';
+import ProfilePage from './pages/ProfilePage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 
 function LandingPage() {
   return (
@@ -69,6 +72,9 @@ function App() {
           <Route path="/earnings" element={<EarningsPage />} />
           <Route path="/sales" element={<SalesDataPage />} />
           <Route path="/marketing" element={<MarketingMaterialsPage />} />
+          <Route path="/academy" element={<AcademyPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/change-password" element={<ChangePasswordPage />} />
         </Route>
 
         {/* Fallback route for 404 or unknown paths to redirect to home */}

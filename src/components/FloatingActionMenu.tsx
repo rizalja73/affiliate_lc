@@ -7,7 +7,8 @@ import {
   Wallet, 
   BarChart3, 
   Image as ImageIcon,
-  Home
+  Home,
+  GraduationCap
 } from 'lucide-react';
 
 export default function FloatingActionMenu() {
@@ -44,6 +45,13 @@ export default function FloatingActionMenu() {
       color: 'bg-gradient-to-tr from-rose-600 to-rose-400',
       shadow: 'shadow-rose-500/40',
       path: '/dashboard'
+    },
+    {
+      icon: <GraduationCap className="w-5 h-5" />,
+      label: 'Academy Affiliate',
+      color: 'bg-gradient-to-tr from-red-600 to-red-400',
+      shadow: 'shadow-red-500/40',
+      path: '/academy'
     },
     {
       icon: <ShoppingBag className="w-5 h-5" />,

@@ -1,11 +1,9 @@
 import {
-  LayoutDashboard,
   ShoppingBag,
   Wallet,
   BarChart3,
   Image as ImageIcon,
   ArrowLeft,
-  LogOut,
   Bell,
   Search,
   TrendingUp,
@@ -13,24 +11,21 @@ import {
   Award,
   ExternalLink,
   ChevronRight,
-  Calendar
+  Calendar,
+  GraduationCap
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import FloatingActionMenu from '../components/FloatingActionMenu';
+import Sidebar from '../components/Sidebar';
+import ProfileDropdown from '../components/ProfileDropdown';
 import { useAuth } from '../hooks/useAuth';
-import { logoutAffiliate } from '../lib/auth';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'ringkasan' | 'komisi'>('ringkasan');
   const [activeTimeFilter, setActiveTimeFilter] = useState<'hari-ini' | 'kemarin' | '7-hari' | 'custom'>('hari-ini');
-
-  const handleLogout = async () => {
-    await logoutAffiliate();
-    navigate('/login');
-  };
 
   const displayName = user?.user_metadata?.first_name 
     ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
@@ -83,49 +78,20 @@ export default function DashboardPage() {
       color: 'bg-orange-500',
       shadow: 'shadow-orange-200',
       link: '/marketing'
+    },
+    {
+      title: 'Academy Affiliate',
+      icon: <GraduationCap className="w-8 h-8" />,
+      description: 'Akses modul eksklusif dan video tutorial untuk Affiliate Pro.',
+      color: 'bg-red-500',
+      shadow: 'shadow-red-200',
+      link: '/academy'
     }
   ];
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      {/* Sidebar - Desktop Only */}
-      <aside className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-100 hidden xl:flex flex-col z-50">
-        <div className="p-8">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-primary-200 overflow-hidden">
-              <img src="/Logo LC.png" alt="Lampung Cerdas" className="w-8 h-8 object-contain" />
-            </div>
-            <div>
-              <div className="text-lg font-black text-gray-900 tracking-tight leading-none">Pusat <span className="text-primary-600">Affiliate</span></div>
-              <div className="text-[10px] uppercase tracking-widest font-black text-primary-500/80 mt-1">Lampung Cerdas</div>
-            </div>
-          </Link>
-        </div>
-
-        <nav className="flex-1 px-6 space-y-2 mt-4">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] px-4 mb-4">Main Menu</div>
-          <a href="#" className="flex items-center gap-3 px-4 py-3.5 bg-primary-50 text-primary-600 rounded-2xl font-bold transition-all">
-            <LayoutDashboard className="w-5 h-5" />
-            Dashboard
-          </a>
-          {menuItems.map((item, idx) => (
-            <Link key={idx} to={item.link} className="flex items-center gap-3 px-4 py-3.5 text-gray-500 hover:bg-gray-50 hover:text-primary-600 rounded-2xl font-bold transition-all">
-              {item.icon}
-              <span className="text-sm">{item.title}</span>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="p-6 border-t border-gray-50">
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3.5 w-full text-red-500 hover:bg-red-50 rounded-2xl font-bold transition-all"
-          >
-            <LogOut className="w-5 h-5" />
-            Keluar
-          </button>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main Content Area */}
       <main className="xl:ml-72 min-h-screen">
@@ -155,15 +121,7 @@ export default function DashboardPage() {
                 <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
               </button>
 
-              <div className="flex items-center gap-3 pl-3 md:pl-6 border-l border-gray-100">
-                <div className="text-right hidden sm:block">
-                  <div className="text-sm font-black text-gray-900">{displayName}</div>
-                  <div className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Affiliate Pro</div>
-                </div>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center font-bold text-primary-700">
-                  {displayName.substring(0, 2).toUpperCase()}
-                </div>
-              </div>
+              <ProfileDropdown />
             </div>
           </div>
         </header>
@@ -252,7 +210,7 @@ export default function DashboardPage() {
               </a>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {menuItems.map((item, idx) => (
                 <Link
                   key={idx}
