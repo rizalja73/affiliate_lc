@@ -7,37 +7,37 @@ const profiles = [
     icon: GraduationCap,
     title: 'Mahasiswa',
     description: 'Cari tambahan uang jajan sambil kuliah dengan promosi fleksibel sesuai jadwal Anda.',
-    gradient: 'from-primary-400 to-primary-600'
+    gradient: 'from-primary-500 to-primary-600'
   },
   {
     icon: Users,
     title: 'Content Creator',
     description: 'Monetisasi audience Anda dengan produk edukatif yang memberikan value nyata.',
-    gradient: 'from-primary-600 to-primary-800'
+    gradient: 'from-primary-500 to-primary-600'
   },
   {
     icon: BookOpen,
     title: 'Guru & Pendidik',
     description: 'Berbagi manfaat pendidikan Lampung Cerdas sambil dapat income tambahan.',
-    gradient: 'from-red-600 to-red-900'
+    gradient: 'from-primary-500 to-primary-600'
   },
   {
     icon: Laptop,
     title: 'Freelancer',
     description: 'Tambah stream income baru dengan memanfaatkan skill digital marketing Anda.',
-    gradient: 'from-primary-700 to-primary-950'
+    gradient: 'from-primary-500 to-primary-600'
   },
   {
     icon: Megaphone,
     title: 'Influencer',
     description: 'Gunakan pengaruh positif Anda untuk membantu orang lain berkembang.',
-    gradient: 'from-red-500 to-primary-700'
+    gradient: 'from-primary-500 to-primary-600'
   },
   {
     icon: Briefcase,
     title: 'Siapa Saja',
     description: 'Siapapun yang ingin produktif dan menghasilkan dari smartphone/laptop.',
-    gradient: 'from-gray-800 to-black'
+    gradient: 'from-primary-500 to-primary-600'
   }
 ];
 
