@@ -39,10 +39,10 @@ export default function DashboardPage() {
       { label: 'Klik Produk', value: '2.840' }
     ],
     komisi: [
-      { label: 'GMV Komisi', value: 'Rp 4.250.000' },
-      { label: 'Produk Berkomisi Terjual', value: '124' },
-      { label: 'Acuan Komisi', value: '10%' },
-      { label: 'Perkiraan Komisi', value: 'Rp 1.250.000' }
+      { label: 'Perkiraan Komisi', value: 'Rp 1.250.000' },
+      { label: 'Produk Berkomisi', value: '124' },
+      { label: 'Harga Jual', value: 'Rp 499.000' },
+      { label: 'Komisi (12%)', value: 'Rp 59.880' }
     ]
   };
 

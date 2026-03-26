@@ -19,6 +19,7 @@ import MarketingMaterialsPage from './pages/MarketingMaterialsPage';
 import AcademyPage from './pages/AcademyPage';
 import ProfilePage from './pages/ProfilePage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 function LandingPage() {
   return (
@@ -69,6 +70,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/earnings" element={<EarningsPage />} />
           <Route path="/sales" element={<SalesDataPage />} />
           <Route path="/marketing" element={<MarketingMaterialsPage />} />

@@ -8,28 +8,129 @@ import {
   Camera, 
   Save,
   ShieldCheck,
-  Briefcase
+  AtSign,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 import Button from '../components/Button';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  const [formData, setFormData] = useState({
+    username: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
+    firstName: user?.user_metadata?.first_name || '',
+    lastName: user?.user_metadata?.last_name || '',
+    whatsapp: '',
+    province: '-', // Default provided in SQL schema NOT NULL
+    address: '',
+    birthDate: ''
+  });
+
+  // Fetch data on mount
+  useEffect(() => {
+    if (!user) return;
+
+    const loadProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('affiliate_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') throw error; 
+
+        if (data) {
+          setFormData({
+            username: data.username || user?.user_metadata?.username || '',
+            firstName: data.first_name || user?.user_metadata?.first_name || '',
+            lastName: data.last_name || user?.user_metadata?.last_name || '',
+            whatsapp: data.whatsapp || '',
+            province: data.province || '-',
+            address: data.address || '',
+            birthDate: data.birth_date || ''
+          });
+        }
+      } catch (err: any) {
+        console.error('Error loading profile:', err);
+      }
+    };
+
+    loadProfile();
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    
+    // Validasi Field NOT NULL
+    if (!formData.username.trim() || !formData.firstName.trim() || !formData.whatsapp.trim() || !formData.address.trim()) {
+       setSaveStatus({ type: 'error', message: 'Tolong lengkapi: Username, Nama Depan, WhatsApp, dan Alamat.' });
+       return;
+    }
+
+    setIsSaving(true);
+    setSaveStatus(null);
+
+    try {
+      // 1. Upsert into affiliate_profiles table
+      const { error: profileError } = await supabase
+        .from('affiliate_profiles')
+        .upsert({
+          user_id: user.id,
+          username: formData.username.trim(),
+          first_name: formData.firstName.trim(),
+          last_name: formData.lastName.trim() || null,
+          whatsapp: formData.whatsapp.trim(),
+          province: formData.province || '-',
+          address: formData.address.trim(),
+          birth_date: formData.birthDate || null
+        }, { onConflict: 'user_id' });
+
+      if (profileError) {
+        console.error('Supabase Profile Error:', profileError);
+        let errorMsg = profileError.message;
+        if (errorMsg.includes('unique constraint')) {
+          errorMsg = 'Username sudah digunakan oleh pengguna lain.';
+        } else if (errorMsg.includes('violates check constraint')) {
+          errorMsg = 'Data yang dimasukkan tidak valid.';
+        }
+        throw new Error(errorMsg);
+      }
+
+      // 2. Update Auth Metadata
+      const { error: authError } = await supabase.auth.updateUser({
+        data: {
+          username: formData.username,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+        }
+      });
+
+      if (authError) throw authError;
+
+      setSaveStatus({ type: 'success', message: 'Profil berhasil diperbarui!' });
+    } catch (err: any) {
+      console.error('Update error:', err);
+      setSaveStatus({ type: 'error', message: err.message || 'Terjadi kesalahan saat menyimpan.' });
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSaveStatus(null), 3000);
+    }
+  };
 
   const displayName = user?.user_metadata?.first_name 
     ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
     : user?.email?.split('@')[0] || 'Member';
-
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => setIsSaving(false), 2000);
-  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -57,6 +158,16 @@ export default function ProfilePage() {
         </header>
 
         <main className="max-w-4xl mx-auto p-6 lg:p-10 w-full">
+          {/* Status Message */}
+          {saveStatus && (
+            <div className={`mb-6 p-4 rounded-2xl border flex items-center gap-3 animate-fade-in ${saveStatus.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-600'}`}>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${saveStatus.type === 'success' ? 'bg-emerald-100' : 'bg-red-100'}`}>
+                {saveStatus.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+              </div>
+              <p className="text-sm font-bold tracking-tight">{saveStatus.message}</p>
+            </div>
+          )}
+
           <div className="space-y-10 animate-fade-in">
             {/* Profile Hero Card */}
             <section className="relative overflow-hidden bg-white rounded-[3rem] border border-gray-100 shadow-sm p-8 lg:p-12">
@@ -102,24 +213,39 @@ export default function ProfilePage() {
 
                   <div className="space-y-6">
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
+                        <div className="relative group">
+                           <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                           <input 
+                              type="text" 
+                              value={formData.username}
+                              onChange={(e) => setFormData({...formData, username: e.target.value})}
+                              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all font-mono"
+                           />
+                        </div>
+                     </div>
+
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Depan</label>
                         <div className="relative group">
                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                            <input 
                               type="text" 
-                              defaultValue={displayName}
+                              value={formData.firstName}
+                              onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                               className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
                            />
                         </div>
                      </div>
 
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Panggilan</label>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Belakang</label>
                         <div className="relative group">
-                           <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                            <input 
                               type="text" 
-                              defaultValue={displayName.split(' ')[0]}
+                              value={formData.lastName}
+                              onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                               className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
                            />
                         </div>
@@ -131,6 +257,8 @@ export default function ProfilePage() {
                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                            <input 
                               type="date" 
+                              value={formData.birthDate}
+                              onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
                               className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
                            />
                         </div>
@@ -168,6 +296,8 @@ export default function ProfilePage() {
                            <input 
                               type="text" 
                               placeholder="628xxxxxxxx"
+                              value={formData.whatsapp}
+                              onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
                               className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
                            />
                         </div>
@@ -179,8 +309,10 @@ export default function ProfilePage() {
                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                            <textarea 
                               rows={2}
+                              value={formData.address}
+                              onChange={(e) => setFormData({...formData, address: e.target.value})}
                               className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all resize-none"
-                              placeholder="Jl. Lampung Cerdas No. 1..."
+                              placeholder="Jl. Bumi Manti III..."
                            />
                         </div>
                      </div>
@@ -219,7 +351,7 @@ export default function ProfilePage() {
         </main>
 
         <footer className="mt-auto p-10 text-center text-sm text-gray-400 font-bold border-t border-gray-100">
-           Layanan Bantuan: support@lampungcerdas.com
+           Layanan Bantuan: it@lampungcerdas.com
         </footer>
       </div>
     </div>

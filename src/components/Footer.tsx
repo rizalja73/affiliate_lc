@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-primary-950 text-gray-400 py-16 md:py-24 relative overflow-hidden">
       {/* Decorative background overlay */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-500 to-transparent opacity-50"></div>
-      
+
       <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
         <div className="grid md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
           <div className="lg:col-span-4 space-y-8">
@@ -18,16 +18,16 @@ export default function Footer() {
                 <div className="text-xs uppercase tracking-[0.2em] font-black text-primary-400/60">Affiliate Elite</div>
               </div>
             </div>
-            
+
             <p className="text-lg leading-relaxed text-gray-400 font-medium">
               Membangun masa depan generasi cerdas Indonesia melalui sistem edukasi berbasis kurikulum terbaik dan peluang ekonomi yang inklusif.
             </p>
-            
+
             <div className="flex gap-4">
               {[Facebook, Instagram, Twitter, Linkedin].map((Icon, i) => (
-                <a 
+                <a
                   key={i}
-                  href="#" 
+                  href="#"
                   className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center hover:bg-primary-600 hover:text-white hover:-translate-y-1 transition-all duration-300"
                 >
                   <Icon className="w-5 h-5" />
@@ -71,7 +71,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">Email Address</p>
-                  <a href="mailto:affiliate@lampungcerdas.com" className="text-sm hover:text-primary-500 transition-colors">affiliate@lampungcerdas.com</a>
+                  <a href="mailto:it@lampungcerdas.com" className="text-sm hover:text-primary-500 transition-colors">it@lampungcerdas.com</a>
                 </div>
               </li>
               <li className="flex items-start gap-4">
@@ -80,7 +80,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">Call Center</p>
-                  <a href="tel:+6281234567890" className="text-sm hover:text-primary-500 transition-colors">+62 812 3456 7890</a>
+                  <a href="tel:+6285147428018" className="text-sm hover:text-primary-500 transition-colors">+6285147428018</a>
                 </div>
               </li>
               <li className="flex items-start gap-4">
@@ -89,7 +89,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">Office Location</p>
-                  <p className="text-sm">Bandar Lampung, Indonesia</p>
+                  <p className="text-sm">Jl. Bumi Manti III, Gg. Sawah Baru 1, Kel. Kampung Baru, Kec. Labuhan Ratu, Kota Bandar Lampung, Lampung 35141Bandar Lampung, Indonesia</p>
                 </div>
               </li>
             </ul>
