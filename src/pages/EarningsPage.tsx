@@ -39,15 +39,16 @@ export default function EarningsPage() {
   // Tabs State
   const [activeTab, setActiveTab] = useState<'pendapatan' | 'penjualan'>('pendapatan');
 
-  // Earnings Page Local State
+  // Page State
   const [activeFilter, setActiveFilter] = useState<'semua' | 'tertunda' | 'terkirim' | 'batal'>('semua');
   const [isCalling, setIsCalling] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Sales Data Local State
-  const [activeSalesView, setActiveSalesView] = useState<'produk' | 'audiens'>('produk');
+  // Data State
   const [orders, setOrders] = useState<any[]>([]);
-  const [loadingSales, setLoadingSales] = useState(false);
-  const [salesError, setSalesError] = useState<string | null>(null);
+  const [totalBalance, setTotalBalance] = useState(0);
+  const [activeSalesView, setActiveSalesView] = useState<'produk' | 'audiens'>('produk');
   const [salesStats, setSalesStats] = useState({
     totalSold: 0,
     lastUpdate: 'Menarik data...',
@@ -60,92 +61,135 @@ export default function EarningsPage() {
     conversionRate: "0%"
   });
 
-  const transactions = [
-    { id: 1, type: 'Komisi Penjualan', amount: 'Rp 150.000', status: 'terkirim', date: '12 Mar 2026', product: 'Kursus CPNS' },
-    { id: 2, type: 'Komisi Penjualan', amount: 'Rp 35.000', status: 'tertunda', date: '11 Mar 2026', product: 'Buku Strategi' },
-    { id: 3, type: 'Komisi Penjualan', amount: 'Rp 40.000', status: 'batal', date: '10 Mar 2026', product: 'E-Book Maba' },
-    { id: 4, type: 'Komisi Penjualan', amount: 'Rp 150.000', status: 'terkirim', date: '09 Mar 2026', product: 'Kursus CPNS' },
-  ];
+  // Success definition (Consistent everywhere)
+  const isStatusSuccess = (status: string) => {
+    if (!status) return false;
+    const s = status.toLowerCase();
+    return s === 'success' || s === 'completed' || s === 'lunas' || s === 'sukses';
+  };
+
+  const isStatusFailed = (status: string) => {
+    if (!status) return false;
+    const s = status.toLowerCase();
+    return s === 'batal' || s === 'failed' || s === 'cancelled' || s === 'gagal';
+  };
+
+  // Derived Transactions for "Riwayat Penghasilan"
+  const transactions = orders.map(o => {
+    let status: 'terkirim' | 'tertunda' | 'batal' = 'tertunda';
+    if (isStatusSuccess(o.status)) status = 'terkirim';
+    if (isStatusFailed(o.status)) status = 'batal';
+
+    return {
+      id: o.id,
+      type: 'Komisi Penjualan',
+      amount: formatCurrency(o.komisi || 0),
+      rawAmount: o.komisi || 0,
+      status: status,
+      date: o.date,
+      product: o.name
+    };
+  });
 
   const filteredTransactions = activeFilter === 'semua'
     ? transactions
     : transactions.filter(t => t.status === activeFilter);
 
-  // Fetch Sales Data Logic (Integrated)
+  // Fetch Logic (Single source of truth)
   useEffect(() => {
-    if (activeTab === 'penjualan' && user) {
-      const fetchSalesData = async () => {
-        try {
-          setLoadingSales(true);
+    const fetchData = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
 
-          // 1. Get Username
-          const { data: profile } = await supabase
-            .from('affiliate_profiles')
-            .select('username')
-            .eq('user_id', user.id)
-            .single();
+        // 1. Get Username
+        const { data: profile } = await supabase
+          .from('affiliate_profiles')
+          .select('username')
+          .eq('user_id', user.id)
+          .single();
+        
+        const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'member';
 
-          const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'member';
+        // 2. Fetch Orders from API
+        const response = await fetch(`https://lampungcerdas.com/api/produks/orders?referral=${username}`, {
+          method: 'GET',
+          headers: {
+            'x-api-key': import.meta.env.VITE_PRODUCTS_API_KEY,
+            'Content-Type': 'application/json'
+          }
+        });
 
-          // 2. Fetch Orders from API
-          const response = await fetch(`https://lampungcerdas.com/api/produks/orders?referral=${username}`, {
-            method: 'GET',
-            headers: {
-              'x-api-key': import.meta.env.VITE_PRODUCTS_API_KEY,
-              'Content-Type': 'application/json'
+        const result = await response.json();
+
+        if (result.success) {
+          const rawOrders = result.data?.data || result.data || [];
+          const formatted = rawOrders.map((o: any) => {
+            // Parse komisi if string
+            let komisiNum = 0;
+            if (o.produk?.komisi) {
+               const rawKomisiStr = (o.produk.komisi || '0').toString();
+               komisiNum = parseInt(rawKomisiStr.replace(/[^0-9]/g, ''), 10) || 0;
             }
+
+            return {
+              id: o.id || Math.random(),
+              name: o.produk?.nama || o.nama_produk || 'Program LC',
+              qty: o.qty || 1,
+              date: o.created_at ? new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-',
+              status: o.status || 'pending',
+              komisi: komisiNum
+            };
           });
 
-          const result = await response.json();
+          setOrders(formatted);
 
-          if (result.success) {
-            const rawOrders = result.data?.data || result.data || [];
-            const formatted = rawOrders.map((o: any) => {
-              const rawPriceStr = (o.total_harga || o.harga || '0').toString();
-              const price = parseInt(rawPriceStr.replace(/[^0-9]/g, ''), 10) || 0;
-              const isSuccess = o.status === 'success' || o.status === 'completed' || o.status === 'Lunas';
-              const commission = isSuccess ? Math.round(price * 0.12) : 0;
+          // Calculate Balance (Sum of all successful commissions)
+          const balance = formatted
+            .filter((o: any) => isStatusSuccess(o.status))
+            .reduce((acc: number, curr: any) => acc + curr.komisi, 0);
+          
+          setTotalBalance(balance);
 
-              return {
-                id: o.id || Math.random(),
-                name: o.produk?.nama || o.nama_produk || 'Program LC',
-                qty: o.qty || 1,
-                date: o.created_at ? new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-',
-                status: o.status || 'pending',
-                komisi: commission
-              };
-            });
+          // Update Sales Stats
+          const totalQty = formatted.reduce((acc: number, curr: any) => acc + curr.qty, 0);
+          const paidOrders = formatted.filter((o: any) => isStatusSuccess(o.status));
+          
+          setSalesStats({
+            totalSold: totalQty,
+            lastUpdate: formatted.length > 0 ? formatted[0].date : 'Belum ada data',
+            returns: 0
+          });
 
-            setOrders(formatted);
-
-            const totalQty = formatted.reduce((acc: number, curr: any) => acc + curr.qty, 0);
-            const paidOrders = formatted.filter((o: any) => o.status === 'success' || o.status === 'completed' || o.status === 'Lunas');
-
-            setSalesStats({
-              totalSold: totalQty,
-              lastUpdate: formatted.length > 0 ? formatted[0].date : 'Belum ada data',
-              returns: 0
-            });
-
-            setAudienceData({
-              clicks: (formatted.length * 15).toLocaleString(),
-              registrations: formatted.length.toLocaleString(),
-              paid: paidOrders.length.toLocaleString(),
-              conversionRate: formatted.length > 0 ? `${((paidOrders.length / (formatted.length * 15)) * 100).toFixed(1)}%` : '0%'
-            });
-          } else {
-            setSalesError('Gagal memuat data dari pusat.');
-          }
-        } catch (err: any) {
-          console.error('Sales fetch error:', err);
-          setSalesError('Terjadi kesalahan koneksi.');
-        } finally {
-          setLoadingSales(false);
+          setAudienceData({
+            clicks: (formatted.length * 15).toLocaleString(),
+            registrations: formatted.length.toLocaleString(),
+            paid: paidOrders.length.toLocaleString(),
+            conversionRate: formatted.length > 0 ? `${((paidOrders.length / (formatted.length * 15)) * 100).toFixed(1)}%` : '0%'
+          });
+        } else {
+          setError('Gagal memuat data dari pusat.');
         }
-      };
-      fetchSalesData();
-    }
-  }, [activeTab, user]);
+      } catch (err: any) {
+        console.error('Fetch error:', err);
+        setError('Terjadi kesalahan koneksi.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  function formatCurrency(val: number) {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(val);
+  }
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -163,14 +207,6 @@ export default function EarningsPage() {
       case 'batal': return <XCircle className="w-4 h-4" />;
       default: return null;
     }
-  };
-
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(val);
   };
 
   return (
@@ -205,7 +241,7 @@ export default function EarningsPage() {
                 </div>
               </div>
             </div>
-
+            
             <div className="hidden md:flex items-center gap-3">
               <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-gray-100 transition-colors">
                 <CreditCard className="w-4 h-4" />
@@ -220,7 +256,19 @@ export default function EarningsPage() {
         </header>
 
         <main className="max-w-7xl mx-auto p-6 lg:p-10 space-y-10 w-full animate-fade-in" key={activeTab}>
-          {activeTab === 'pendapatan' ? (
+          {loading ? (
+             <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+                <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
+                <p className="font-black text-gray-400 uppercase tracking-widest">Sinkronisasi Data...</p>
+             </div>
+          ) : error ? (
+            <div className="bg-red-50 p-12 rounded-[3.5rem] border border-red-100 text-center space-y-4">
+               <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
+               <h3 className="text-xl font-black text-red-900">Koneksi Gagal</h3>
+               <p className="text-red-700 font-medium">{error}</p>
+               <Button variant="outline" onClick={() => window.location.reload()}>Coba Lagi</Button>
+            </div>
+          ) : activeTab === 'pendapatan' ? (
             <>
               {/* Balance Section */}
               <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-[3rem] p-10 lg:p-14 text-white shadow-2xl shadow-emerald-200">
@@ -231,11 +279,11 @@ export default function EarningsPage() {
                       Saldo Tersedia
                     </div>
                     <div className="text-5xl lg:text-7xl font-black tracking-tight">
-                      Rp 2.450.000
+                      {formatCurrency(totalBalance)}
                     </div>
                     <p className="text-emerald-100/70 font-medium flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
-                      Naik Rp 450.000 dari minggu lalu
+                      Data tersinkronisasi otomatis
                     </p>
                   </div>
 
@@ -248,7 +296,6 @@ export default function EarningsPage() {
                   </div>
                 </div>
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-black opacity-10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
               </section>
 
               {/* Transaction Legend/Filter Section */}
@@ -397,19 +444,7 @@ export default function EarningsPage() {
                 </button>
               </div>
 
-              {loadingSales ? (
-                <div className="flex flex-col items-center justify-center h-[50vh] space-y-4">
-                  <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-                  <p className="font-black text-gray-400 uppercase tracking-widest">Sinkronisasi Data...</p>
-                </div>
-              ) : salesError ? (
-                <div className="bg-red-50 p-12 rounded-[3.5rem] border border-red-100 text-center space-y-4">
-                  <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
-                  <h3 className="text-xl font-black text-red-900">Koneksi Gagal</h3>
-                  <p className="text-red-700 font-medium">{salesError}</p>
-                  <Button variant="outline" onClick={() => setActiveTab('penjualan')}>Coba Lagi</Button>
-                </div>
-              ) : activeSalesView === 'produk' ? (
+              {activeSalesView === 'produk' ? (
                 <div className="space-y-10">
                   <div className="grid lg:grid-cols-3 gap-8">
                     <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center gap-6">
@@ -459,7 +494,7 @@ export default function EarningsPage() {
                           <tr className="bg-gray-50/50">
                             <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nama Produk</th>
                             <th className="px-6 py-5 text-[10px] font-black text-center text-gray-400 uppercase tracking-widest">Tanggal</th>
-                            <th className="px-6 py-5 text-[10px] font-black text-center text-gray-400 uppercase tracking-widest">Status</th>
+                            <th className="px-6 py-5 text-[10px) font-black text-center text-gray-400 uppercase tracking-widest">Status</th>
                             <th className="px-10 py-5 text-[10px] font-black text-right text-gray-400 uppercase tracking-widest">Komisi</th>
                           </tr>
                         </thead>
@@ -469,12 +504,14 @@ export default function EarningsPage() {
                               <td className="px-10 py-8 font-black text-gray-900 group-hover:text-primary-600 transition-colors">{o.name}</td>
                               <td className="px-6 py-8 text-center text-sm font-bold text-gray-500 italic">{o.date}</td>
                               <td className="px-6 py-8 text-center">
-                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${o.status === 'success' || o.status === 'completed' || o.status === 'Lunas' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-orange-50 text-orange-600 border-orange-100'}`}>
+                                <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${isStatusSuccess(o.status) ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-orange-50 text-orange-600 border-orange-100'}`}>
                                   {o.status}
                                 </span>
                               </td>
                               <td className="px-10 py-8 text-right font-black text-lg">
-                                <span className="text-primary-600">{formatCurrency(o.komisi)}</span>
+                                <span className={isStatusSuccess(o.status) ? "text-primary-600" : "text-gray-300 italic text-sm"}>
+                                  {isStatusSuccess(o.status) ? formatCurrency(o.komisi) : "Menunggu..."}
+                                </span>
                               </td>
                             </tr>
                           )) : (
@@ -518,7 +555,7 @@ export default function EarningsPage() {
                         <h3 className="text-2xl font-black text-gray-900">Analisis Funnel</h3>
                         <p className="text-gray-500 font-medium">Data real-time dari performa link afiliasi Anda.</p>
                       </div>
-
+                      
                       <div className="space-y-6">
                         {[
                           { step: 'Kunjungan Link (Est)', value: audienceData.clicks, width: '100%', color: 'bg-primary-600' },
