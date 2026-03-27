@@ -11,39 +11,120 @@ import {
   ExternalLink,
   ChevronRight,
   Calendar,
-  GraduationCap
+  GraduationCap,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FloatingActionMenu from '../components/FloatingActionMenu';
 import Sidebar from '../components/Sidebar';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'ringkasan' | 'komisi'>('ringkasan');
   const [activeTimeFilter, setActiveTimeFilter] = useState<'hari-ini' | 'kemarin' | '7-hari' | 'custom'>('hari-ini');
+  
+  // Real-time stats state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [statsData, setStatsData] = useState({
+    gmv: 0,
+    sold: 0,
+    komisi: 0
+  });
 
   const displayName = user?.user_metadata?.first_name 
     ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
     : user?.email?.split('@')[0] || 'Member';
 
-  const stats: Record<string, { label: string; value: string }[]> = {
-    ringkasan: [
-      { label: 'GMV Teratribusi', value: 'Rp 42.500.000' },
-      { label: 'Produk Terjual Teratribusi', value: '156' },
-      { label: 'Impresi Produk', value: '18.420' },
-      { label: 'Klik Produk', value: '2.840' }
-    ],
-    komisi: [
-      { label: 'Perkiraan Komisi', value: 'Rp 1.250.000' },
-      { label: 'Produk Berkomisi', value: '124' },
-      { label: 'Harga Jual', value: 'Rp 499.000' },
-      { label: 'Komisi (12%)', value: 'Rp 59.880' }
-    ]
+  // Helper (Same logic as EarningsPage)
+  const isStatusSuccess = (status: string) => {
+    if (!status) return false;
+    const s = status.toLowerCase();
+    return s === 'success' || s === 'completed' || s === 'lunas' || s === 'sukses';
   };
+
+  useEffect(() => {
+    const fetchPerformanceData = async () => {
+      if (!user) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 1. Get Username
+        const { data: profile } = await supabase
+          .from('affiliate_profiles')
+          .select('username')
+          .eq('user_id', user.id)
+          .single();
+        
+        const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'member';
+
+        // 2. Fetch Orders
+        const response = await fetch(`https://lampungcerdas.com/api/produks/orders?referral=${username}`, {
+          method: 'GET',
+          headers: {
+            'x-api-key': import.meta.env.VITE_PRODUCTS_API_KEY,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const rawOrders = result.data?.data || result.data || [];
+          
+          let totalGMV = 0;
+          let totalSold = 0;
+          let totalKomisi = 0;
+
+          rawOrders.forEach((o: any) => {
+            if (isStatusSuccess(o.status)) {
+              // Calculate GMV (Price * Qty)
+              const price = o.produk?.harga || o.harga || 0;
+              const qty = o.qty || 1;
+              totalGMV += (price * qty);
+
+              // Calculate Sold (Qty)
+              totalSold += qty;
+
+              // Calculate Komisi
+              let komisiNum = 0;
+              if (o.produk?.komisi) {
+                 const rawKomisiStr = (o.produk.komisi || '0').toString();
+                 komisiNum = parseInt(rawKomisiStr.replace(/[^0-9]/g, ''), 10) || 0;
+              }
+              totalKomisi += komisiNum;
+            }
+          });
+
+          setStatsData({
+            gmv: totalGMV,
+            sold: totalSold,
+            komisi: totalKomisi
+          });
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError('Gagal mensinkronkan data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPerformanceData();
+  }, [user]);
+
+  const stats = [
+    { label: 'GMV', value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(statsData.gmv) },
+    { label: 'Produk Terjual', value: `${statsData.sold} unit` },
+    { label: 'Komisi', value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(statsData.komisi) }
+  ];
 
   const menuItems = [
     {
@@ -123,10 +204,22 @@ export default function DashboardPage() {
             <div className="relative z-10 space-y-10">
               <div className="grid lg:grid-cols-2 gap-8 items-start">
                 <div className="space-y-6">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold border border-white/20">
-                    <TrendingUp className="w-4 h-4" />
-                    Performa Anda naik 24% hari ini!
-                  </div>
+                  {loading ? (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold border border-white/20 animate-pulse">
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      Mensinkronkan data...
+                    </div>
+                  ) : error ? (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 rounded-full text-sm font-bold border border-white/20">
+                      <AlertCircle className="w-4 h-4 text-white" />
+                      Oops! {error}
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold border border-white/20">
+                      <TrendingUp className="w-4 h-4" />
+                      Performa Anda tersinkronisasi otomatis!
+                    </div>
+                  )}
                   <h2 className="text-4xl lg:text-5xl font-black leading-tight">
                     Halo, {displayName.split(' ')[0]}! <br />
                     Siap raih <span className="text-primary-100">komisi besar?</span>
@@ -156,30 +249,22 @@ export default function DashboardPage() {
                     ))}
                   </div>
 
-                  {/* Tab Buttons - Segmented Control Style */}
-                  <div className="flex p-1.5 bg-black/10 backdrop-blur-md rounded-2xl w-fit border border-white/5 shadow-inner self-end lg:self-auto">
-                    <button
-                      onClick={() => setActiveTab('ringkasan')}
-                      className={`px-8 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${activeTab === 'ringkasan' ? 'bg-white text-primary-600 shadow-lg scale-105' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-                    >
-                      Ringkasan
-                    </button>
-                    <button
-                      onClick={() => setActiveTab('komisi')}
-                      className={`px-8 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 ${activeTab === 'komisi' ? 'bg-white text-primary-600 shadow-lg scale-105' : 'text-white/60 hover:text-white hover:bg-white/5'}`}
-                    >
-                      Komisi
-                    </button>
-                  </div>
+                  <button
+                    className="px-8 py-2.5 bg-white text-primary-600 shadow-lg rounded-xl text-xs font-black tracking-widest uppercase transition-all duration-300 pointer-events-none"
+                  >
+                    Komisi
+                  </button>
                 </div>
               </div>
 
               {/* Stats Highlights Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in" key={`${activeTab}-${activeTimeFilter}`}>
-                {stats[activeTab].map((stat, i) => (
-                  <div key={i} className="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/10 group hover:bg-white/20 transition-all cursor-default relative overflow-hidden">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in" key={activeTimeFilter}>
+                {stats.map((stat, i) => (
+                  <div key={i} className={`bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/10 group hover:bg-white/20 transition-all cursor-default relative overflow-hidden ${loading ? 'animate-pulse' : ''}`}>
                     <div className="text-primary-100 text-[10px] font-black uppercase tracking-[0.2em] mb-3 opacity-80 group-hover:opacity-100 transition-opacity">{stat.label}</div>
-                    <div className="text-2xl font-black tracking-tight">{stat.value}</div>
+                    <div className="text-2xl font-black tracking-tight">
+                      {loading ? '...' : stat.value}
+                    </div>
                     {/* Subtle line decoration */}
                     <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform"></div>
                   </div>

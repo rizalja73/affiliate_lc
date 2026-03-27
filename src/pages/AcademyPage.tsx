@@ -9,9 +9,11 @@ import {
   Lock, 
   CheckCircle2,
   Youtube,
-  FileText
+  FileText,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import FloatingActionMenu from '../components/FloatingActionMenu';
@@ -21,73 +23,55 @@ import ProfileDropdown from '../components/ProfileDropdown';
 export default function AcademyPage() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<'all' | 'modul' | 'video'>('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [academies, setAcademies] = useState<any[]>([]);
 
-  const academyContent = [
-    {
-      id: 1,
-      title: "Mindset Jutawan Affiliate",
-      type: "video",
-      duration: "15:20",
-      description: "Membangun pondasi mental yang kuat untuk menjadi super affiliate yang sukses.",
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop&q=60",
-      isPremium: false,
-      lessons: 1
-    },
-    {
-      id: 2,
-      title: "Strategi Copywriting yang Menjual",
-      type: "modul",
-      duration: "45 Halaman",
-      description: "Panduan lengkap menulis kata-kata yang menghipnotis calon pembeli.",
-      image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=60",
-      isPremium: true,
-      lessons: 12
-    },
-    {
-      id: 3,
-      title: "Optimasi Iklan Facebook & Instagram",
-      type: "video",
-      duration: "120:00",
-      description: "Teknik beriklan murah dengan hasil konversi yang maksimal untuk Lampung Cerdas.",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
-      isPremium: true,
-      lessons: 5
-    },
-    {
-      id: 4,
-      title: "Rahasia Personal Branding di TikTok",
-      type: "video",
-      duration: "45:30",
-      description: "Cara cepat membangun audiens loyal yang siap membeli apa pun yang Anda tawarkan.",
-      image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&auto=format&fit=crop&q=60",
-      isPremium: false,
-      lessons: 3
-    },
-    {
-      id: 5,
-      title: "E-Book: 100 Template Promosi",
-      type: "modul",
-      duration: "100 Template",
-      description: "Kumpulan template siap pakai untuk berbagai platform media sosial.",
-      image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=60",
-      isPremium: true,
-      lessons: 1
-    },
-    {
-      id: 6,
-      title: "Webinar: Closing Tanpa Tapi",
-      type: "video",
-      duration: "90:00",
-      description: "Rekaman webinar eksklusif tentang teknik closing yang belum pernah dibagikan.",
-      image: "https://images.unsplash.com/photo-1540575861501-7ad058de391c?w=800&auto=format&fit=crop&q=60",
-      isPremium: true,
-      lessons: 1
-    }
-  ];
+  useEffect(() => {
+    const fetchAcademies = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://lampungcerdas.com/api/academies', {
+          method: 'GET',
+          headers: {
+            'x-api-key': 'lc-api-key-2026',
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const rawData = result.data?.data || result.data || [];
+          const formatted = rawData.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            type: "video", // Default from API
+            duration: "Tutorial",
+            description: item.description || "Materi eksklusif Academy Affiliate Lampung Cerdas.",
+            image: item.thumbnail_url || "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&auto=format&fit=crop&q=60",
+            isPremium: false, // Default for now
+            lessons: 1,
+            link: item.video_url
+          }));
+          setAcademies(formatted);
+        } else {
+          setError('Gagal memuat materi academy.');
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError('Terjadi kesalahan koneksi.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAcademies();
+  }, []);
 
   const filteredContent = activeCategory === 'all' 
-    ? academyContent 
-    : academyContent.filter(item => item.type === activeCategory);
+    ? academies 
+    : academies.filter(item => item.type === activeCategory);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -118,8 +102,8 @@ export default function AcademyPage() {
 
           <div className="flex items-center gap-3">
              <div className="hidden sm:flex flex-col items-end">
-                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Progress Belajar</div>
-                <div className="text-sm font-black text-primary-600">45% Selesai</div>
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Update Terakhir</div>
+                <div className="text-sm font-black text-primary-600">Terbaru</div>
              </div>
              <ProfileDropdown />
           </div>
@@ -141,16 +125,16 @@ export default function AcademyPage() {
                   <span className="text-primary-400">Lipat Gandakan Komisi!</span>
                 </h2>
                 <p className="text-lg text-primary-50/70 font-medium leading-relaxed max-w-lg">
-                  Akses modul eksklusif dan video tutorial yang dirancang khusus untuk membantu Anda sukses di Affiliate Lampung Cerdas.
+                  Akses materi eksklusif Academy Affiliate yang diambil langsung dari database pusat Lampung Cerdas.
                 </p>
                 <div className="flex flex-wrap gap-4">
                    <div className="flex items-center gap-2 px-4 py-2 bg-black/20 rounded-xl border border-white/5">
                       <Play className="w-4 h-4 text-primary-400" />
-                      <span className="text-sm font-bold">12+ Jam Video</span>
+                      <span className="text-sm font-bold">{academies.length}+ Materi Video</span>
                    </div>
                    <div className="flex items-center gap-2 px-4 py-2 bg-black/20 rounded-xl border border-white/5">
                       <BookOpen className="w-4 h-4 text-primary-400" />
-                      <span className="text-sm font-bold">8 Modul Utama</span>
+                      <span className="text-sm font-bold">Akses Unlimited</span>
                    </div>
                 </div>
               </div>
@@ -164,19 +148,18 @@ export default function AcademyPage() {
                     </div>
                     <div className="space-y-2">
                        <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary-500 w-[65%]" />
+                          <div className="h-full bg-primary-500 w-[100%]" />
                        </div>
                        <div className="flex justify-between text-[10px] font-black text-white/50 uppercase tracking-widest">
-                          <span>Progress Saat Ini</span>
-                          <span>65%</span>
+                          <span>Sistem Siap Digunakan</span>
+                          <span>100%</span>
                        </div>
                     </div>
-                    <Button variant="primary" className="w-full">Lanjutkan Belajar</Button>
+                    <Button variant="primary" className="w-full">Lihat Semua Materi</Button>
                  </div>
               </div>
             </div>
             
-            {/* Background Decoration */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-primary-400/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-600/10 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
           </section>
@@ -186,7 +169,6 @@ export default function AcademyPage() {
              <div className="flex p-1.5 bg-white rounded-2xl border border-gray-100 shadow-sm">
                 {[
                   { id: 'all', label: 'Semua Materi', icon: <Layers className="w-4 h-4" /> },
-                  { id: 'modul', label: 'E-Book & Modul', icon: <FileText className="w-4 h-4" /> },
                   { id: 'video', label: 'Video Tutorial', icon: <Youtube className="w-4 h-4" /> }
                 ].map((cat) => (
                   <button
@@ -204,85 +186,82 @@ export default function AcademyPage() {
                 <span className="text-sm font-bold text-gray-400">Urutkan:</span>
                 <select className="bg-white border border-gray-100 px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 outline-none focus:ring-2 focus:ring-primary-100">
                    <option>Terbaru</option>
-                   <option>Paling Populer</option>
-                   <option>Durasi Terpendek</option>
                 </select>
              </div>
           </div>
 
           {/* Academy Content Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredContent.map((item) => (
-              <div key={item.id} className="group bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
-                <div className="relative h-56 overflow-hidden">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
-                  
-                  {/* Lock Overlay for Premium */}
-                  {item.isPremium && (
+          {loading ? (
+             <div className="flex flex-col items-center justify-center py-32 bg-white rounded-[3rem] border border-gray-100">
+                <Loader2 className="w-12 h-12 text-primary-600 animate-spin mb-4" />
+                <p className="font-black text-gray-400 uppercase tracking-widest">Menyiapkan Materi...</p>
+             </div>
+          ) : error ? (
+            <div className="bg-red-50 p-12 rounded-[3.5rem] border border-red-100 text-center space-y-4">
+               <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
+               <h3 className="text-xl font-black text-red-900">Gagal Memuat</h3>
+               <p className="text-red-700 font-medium">{error}</p>
+               <Button variant="outline" onClick={() => window.location.reload()}>Coba Lagi</Button>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredContent.map((item) => (
+                <div key={item.id} className="group bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+                  <div className="relative h-56 overflow-hidden">
+                    <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                    
+                    {/* Play Button Overlay */}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                       <div className="bg-white/20 backdrop-blur-md p-4 rounded-full border border-white/30 text-white">
-                          <Lock className="w-8 h-8" />
-                       </div>
-                    </div>
-                  )}
-
-                  {/* Play Button Overlay for Videos */}
-                  {item.type === 'video' && !item.isPremium && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                       <div className="bg-primary-600 p-4 rounded-full shadow-2xl text-white transform group-hover:scale-110 transition-transform">
+                       <a href={item.link} target="_blank" rel="noopener noreferrer" className="bg-primary-600 p-4 rounded-full shadow-2xl text-white transform group-hover:scale-110 transition-transform">
                           <Play className="w-8 h-8 fill-current" />
-                       </div>
+                       </a>
                     </div>
-                  )}
 
-                  <div className="absolute top-6 left-6 flex gap-2">
-                    <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl border border-white/20 backdrop-blur-md ${item.type === 'video' ? 'bg-blue-600/80 text-white' : 'bg-emerald-600/80 text-white'}`}>
-                      {item.type}
-                    </div>
-                    {item.isPremium && (
-                      <div className="bg-yellow-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-yellow-950 shadow-xl border border-yellow-400/50">
-                        Premium
+                    <div className="absolute top-6 left-6 flex gap-2">
+                      <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl border border-white/20 backdrop-blur-md bg-blue-600/80 text-white`}>
+                        {item.type}
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-8 space-y-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                       <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                          <Clock className="w-3.5 h-3.5" />
-                          {item.duration}
-                       </div>
-                       <div className="flex items-center gap-2 text-[10px] font-black text-primary-500 uppercase tracking-widest">
-                          <BookOpen className="w-3.5 h-3.5" />
-                          {item.lessons} Lesson
-                       </div>
                     </div>
-                    <h3 className="text-xl font-black text-gray-900 leading-tight group-hover:text-primary-600 transition-colors">{item.title}</h3>
-                    <p className="text-sm text-gray-500 font-medium leading-relaxed line-clamp-2">
-                      {item.description}
-                    </p>
                   </div>
 
-                  <button className={`w-full py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all ${item.isPremium ? 'bg-gray-100 text-gray-400 cursor-not-allowed group-hover:bg-gray-200' : 'bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white shadow-sm'}`}>
-                    {item.isPremium ? (
-                      <>
-                        <Lock className="w-4 h-4" />
-                        Upgrade Pro Untuk Akses
-                      </>
-                    ) : (
-                      <>
-                        Mulai Belajar
-                        <ChevronRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
+                  <div className="p-8 space-y-6">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                            <Clock className="w-3.5 h-3.5" />
+                            {item.duration}
+                         </div>
+                         <div className="flex items-center gap-2 text-[10px] font-black text-primary-500 uppercase tracking-widest">
+                            <BookOpen className="w-3.5 h-3.5" />
+                            Live Center
+                         </div>
+                      </div>
+                      <h3 className="text-xl font-black text-gray-900 leading-tight group-hover:text-primary-600 transition-colors">{item.title}</h3>
+                      <p className="text-sm text-gray-500 font-medium leading-relaxed line-clamp-2">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <a 
+                      href={item.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-full py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white shadow-sm"
+                    >
+                      Mulai Belajar
+                      <ChevronRight className="w-4 h-4" />
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+              {academies.length === 0 && (
+                <div className="col-span-full py-20 text-center text-gray-400 font-black uppercase tracking-widest italic">
+                  Belum ada materi tersedia saat ini.
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Need Help Section */}
           <section className="bg-white rounded-[2.5rem] p-10 lg:p-12 border border-gray-100 shadow-sm flex flex-wrap items-center justify-between gap-8">
@@ -300,7 +279,7 @@ export default function AcademyPage() {
 
         <footer className="max-w-7xl mx-auto p-10 text-center border-t border-gray-100 mt-auto">
           <p className="text-sm text-gray-400 font-bold">
-            Dapatkan materi terbaru setiap minggunya hanya di Academy Affiliate Pro.
+            Materi ini disinkronkan langsung dari pusat Lampung Cerdas.
           </p>
         </footer>
       </div>

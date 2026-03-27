@@ -17,6 +17,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import FloatingActionMenu from '../components/FloatingActionMenu';
+import Sidebar from '../components/Sidebar';
+import ProfileDropdown from '../components/ProfileDropdown';
 
 export default function MarketingMaterialsPage() {
   const navigate = useNavigate();
@@ -84,27 +86,33 @@ export default function MarketingMaterialsPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-10 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center justify-center w-10 h-10 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all border border-gray-100 bg-white"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-xl font-black text-gray-900 leading-none">Bahan Marketing</h1>
-              <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mt-1">Kit Promosi Affiliate</p>
+      <Sidebar />
+      <div className="xl:ml-72 min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-10 py-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="flex items-center justify-center w-10 h-10 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all border border-gray-100 bg-white"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="text-xl font-black text-gray-900 leading-none">Bahan Marketing</h1>
+                <p className="text-[10px] uppercase tracking-widest font-black text-gray-400 mt-1">Kit Promosi Affiliate</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary-100">
+                <Sparkles className="w-3 h-3" />
+                Live dari Pusat
+              </div>
+              <ProfileDropdown />
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary-100">
-            <Sparkles className="w-3 h-3" />
-            Live dari Pusat
-          </div>
-        </div>
-      </header>
+        </header>
 
       <main className="max-w-7xl mx-auto p-6 lg:p-10 space-y-12">
         {/* Hero Promotion */}
@@ -247,6 +255,7 @@ export default function MarketingMaterialsPage() {
           </p>
       </footer>
       <FloatingActionMenu />
+      </div>
     </div>
   );
 }

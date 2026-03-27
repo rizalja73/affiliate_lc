@@ -21,9 +21,13 @@ import {
   AlertCircle,
   MousePointer2,
   UserPlus,
-  BarChart3
+  BarChart3,
+  Mail,
+  Phone,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -44,6 +48,7 @@ export default function EarningsPage() {
   const [isCalling, setIsCalling] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedTxId, setExpandedTxId] = useState<number | null>(null);
 
   // Data State
   const [orders, setOrders] = useState<any[]>([]);
@@ -87,7 +92,10 @@ export default function EarningsPage() {
       rawAmount: o.komisi || 0,
       status: status,
       date: o.date,
-      product: o.name
+      product: o.name,
+      email: o.email || '-',
+      phone: o.phone || '-',
+      buyerName: o.buyerName || '-'
     };
   });
 
@@ -140,7 +148,10 @@ export default function EarningsPage() {
               qty: o.qty || 1,
               date: o.created_at ? new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-',
               status: o.status || 'pending',
-              komisi: komisiNum
+              komisi: komisiNum,
+              buyerName: o.user?.name || o.buyer_name || o.nama_pembeli || o.user_name || '-',
+              email: o.user_email || o.email || '-',
+              phone: o.user_phone || o.no_wa || o.no_hp || '-'
             };
           });
 
@@ -336,7 +347,7 @@ export default function EarningsPage() {
                 {/* Transaction List */}
                 <div className="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                    <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-gray-50/50">
                           <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Detail Transaksi</th>
@@ -347,33 +358,76 @@ export default function EarningsPage() {
                       </thead>
                       <tbody className="divide-y divide-gray-50">
                         {filteredTransactions.map((t) => (
-                          <tr key={t.id} className="hover:bg-gray-50/30 transition-colors group">
-                            <td className="px-10 py-8">
-                              <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getStatusStyle(t.status)}`}>
-                                  {getStatusIcon(t.status)}
+                          <React.Fragment key={t.id}>
+                            <tr className={`hover:bg-gray-50/30 transition-colors group ${expandedTxId === t.id ? 'bg-primary-50/20' : ''}`}>
+                              <td className="px-10 py-8">
+                                <div className="flex items-center gap-4">
+                                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getStatusStyle(t.status)}`}>
+                                    {getStatusIcon(t.status)}
+                                  </div>
+                                  <div>
+                                    <div className="font-black text-gray-900 group-hover:text-primary-600 transition-colors">{t.type}</div>
+                                    <div className="text-xs font-bold text-gray-400 mt-0.5">{t.product}</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <div className="font-black text-gray-900 group-hover:text-primary-600 transition-colors">{t.type}</div>
-                                  <div className="text-xs font-bold text-gray-400 mt-0.5">{t.product}</div>
+                              </td>
+                              <td className="px-6 py-8 text-center text-sm font-bold text-gray-500 italic">
+                                {t.date}
+                              </td>
+                              <td className="px-6 py-8">
+                                <div className="flex items-center gap-3">
+                                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${getStatusStyle(t.status)}`}>
+                                    {t.status}
+                                  </span>
+                                  <button 
+                                    onClick={() => setExpandedTxId(expandedTxId === t.id ? null : t.id)}
+                                    className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-all ${expandedTxId === t.id ? 'text-primary-600 bg-primary-50 px-2 py-1 rounded-md' : 'text-gray-400 hover:text-primary-600'}`}
+                                  >
+                                    Detail {expandedTxId === t.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                  </button>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-8 text-center text-sm font-bold text-gray-500 italic">
-                              {t.date}
-                            </td>
-                            <td className="px-6 py-8">
-                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${getStatusStyle(t.status)}`}>
-                                {t.status}
-                              </span>
-                            </td>
-                            <td className="px-10 py-8 text-right">
-                              <div className="text-lg font-black text-gray-900 tracking-tight">{t.amount}</div>
-                              <button className="text-[10px] font-black text-primary-600 hover:underline mt-1 flex items-center gap-1 ml-auto">
-                                Detail <ChevronRight className="w-3 h-3" />
-                              </button>
-                            </td>
-                          </tr>
+                              </td>
+                              <td className="px-10 py-8 text-right">
+                                <div className="text-lg font-black text-gray-900 tracking-tight">{t.amount}</div>
+                              </td>
+                            </tr>
+                            {/* Expanded Detail Row */}
+                            {expandedTxId === t.id && (
+                              <tr className="bg-primary-50/30 animate-fade-in">
+                                <td colSpan={4} className="px-10 py-6 border-l-4 border-primary-600 shadow-inner">
+                                  <div className="grid md:grid-cols-3 gap-6">
+                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
+                                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                                        <Users className="w-5 h-5" />
+                                      </div>
+                                      <div>
+                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Nama Pendaftar</div>
+                                        <div className="font-bold text-gray-900">{t.buyerName}</div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
+                                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                                        <Mail className="w-5 h-5" />
+                                      </div>
+                                      <div>
+                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Email Pendaftar</div>
+                                        <div className="font-bold text-gray-900">{t.email}</div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
+                                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                                        <Phone className="w-5 h-5" />
+                                      </div>
+                                      <div>
+                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Nomor WhatsApp</div>
+                                        <div className="font-bold text-gray-900">{t.phone}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
                         ))}
                         {filteredTransactions.length === 0 && (
                           <tr>
@@ -446,7 +500,7 @@ export default function EarningsPage() {
 
               {activeSalesView === 'produk' ? (
                 <div className="space-y-10">
-                  <div className="grid lg:grid-cols-3 gap-8">
+                  <div className="grid lg:grid-cols-2 gap-8">
                     <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center gap-6">
                       <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
                         <ShoppingBag className="w-8 h-8" />
@@ -463,15 +517,6 @@ export default function EarningsPage() {
                       <div>
                         <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Update Terakhir</div>
                         <div className="text-lg font-black text-gray-900">{salesStats.lastUpdate}</div>
-                      </div>
-                    </div>
-                    <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-center gap-6">
-                      <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-600">
-                        <RefreshCw className="w-8 h-8" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Status Issue</div>
-                        <div className="text-3xl font-black text-gray-900">{salesStats.returns} <span className="text-sm text-gray-400 font-bold ml-1">Kasus</span></div>
                       </div>
                     </div>
                   </div>
@@ -494,7 +539,7 @@ export default function EarningsPage() {
                           <tr className="bg-gray-50/50">
                             <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nama Produk</th>
                             <th className="px-6 py-5 text-[10px] font-black text-center text-gray-400 uppercase tracking-widest">Tanggal</th>
-                            <th className="px-6 py-5 text-[10px) font-black text-center text-gray-400 uppercase tracking-widest">Status</th>
+                            <th className="px-6 py-5 text-[10px] font-black text-center text-gray-400 uppercase tracking-widest">Status</th>
                             <th className="px-10 py-5 text-[10px] font-black text-right text-gray-400 uppercase tracking-widest">Komisi</th>
                           </tr>
                         </thead>
