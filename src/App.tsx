@@ -14,7 +14,6 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProductsPage from './pages/ProductsPage';
 import EarningsPage from './pages/EarningsPage';
-import SalesDataPage from './pages/SalesDataPage';
 import MarketingMaterialsPage from './pages/MarketingMaterialsPage';
 import AcademyPage from './pages/AcademyPage';
 import ProfilePage from './pages/ProfilePage';
@@ -72,7 +71,7 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/earnings" element={<EarningsPage />} />
-          <Route path="/sales" element={<SalesDataPage />} />
+
           <Route path="/marketing" element={<MarketingMaterialsPage />} />
           <Route path="/academy" element={<AcademyPage />} />
           <Route path="/profile" element={<ProfilePage />} />

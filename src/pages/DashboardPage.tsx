@@ -1,7 +1,6 @@
 import {
   ShoppingBag,
   Wallet,
-  BarChart3,
   Image as ImageIcon,
   ArrowLeft,
   Bell,
@@ -58,18 +57,10 @@ export default function DashboardPage() {
     {
       title: 'Cek Pendapatan',
       icon: <Wallet className="w-8 h-8" />,
-      description: 'Pantau saldo komisi dan atur rekening pencairan dana Anda.',
+      description: 'Pantau saldo komisi, data penjualan, dan performa link affiliate Anda.',
       color: 'bg-emerald-500',
       shadow: 'shadow-emerald-200',
       link: '/earnings'
-    },
-    {
-      title: 'Lihat Data Penjualan',
-      icon: <BarChart3 className="w-8 h-8" />,
-      description: 'Analisis performa link affiliate dan statistik penjualan harian.',
-      color: 'bg-purple-500',
-      shadow: 'shadow-purple-200',
-      link: '/sales'
     },
     {
       title: 'Bahan Marketing',

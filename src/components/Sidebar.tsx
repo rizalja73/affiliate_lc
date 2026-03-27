@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Wallet,
-  BarChart3,
   Image as ImageIcon,
   LogOut,
   GraduationCap
@@ -34,11 +33,6 @@ export default function Sidebar() {
       title: 'Cek Pendapatan',
       icon: <Wallet className="w-5 h-5" />,
       link: '/earnings'
-    },
-    {
-      title: 'Data Penjualan',
-      icon: <BarChart3 className="w-5 h-5" />,
-      link: '/sales'
     },
     {
       title: 'Bahan Marketing',

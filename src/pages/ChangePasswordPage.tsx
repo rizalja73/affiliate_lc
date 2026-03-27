@@ -14,13 +14,18 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ProfileDropdown from '../components/ProfileDropdown';
 import Button from '../components/Button';
+import { supabase } from '../lib/supabase';
 
 export default function ChangePasswordPage() {
   const navigate = useNavigate();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [showPassword, setShowPassword] = useState({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   });
   const [isChanging, setIsChanging] = useState(false);
 
@@ -28,9 +33,37 @@ export default function ChangePasswordPage() {
     setShowPassword(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
-  const handleChange = () => {
+  const handleChange = async () => {
+    if (!newPassword || !confirmPassword) {
+      setStatus({ type: 'error', message: 'Password baru tidak boleh kosong.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setStatus({ type: 'error', message: 'Konfirmasi password tidak cocok.' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      setStatus({ type: 'error', message: 'Password minimal 6 karakter.' });
+      return;
+    }
+
     setIsChanging(true);
-    setTimeout(() => setIsChanging(false), 2000);
+    setStatus(null);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+      if (error) throw error;
+      setStatus({ type: 'success', message: 'Password berhasil diperbarui!' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setStatus({ type: 'error', message: err.message || 'Gagal merubah password.' });
+    } finally {
+      setIsChanging(false);
+      setTimeout(() => setStatus(null), 3000);
+    }
   };
 
   return (
@@ -71,6 +104,14 @@ export default function ChangePasswordPage() {
 
             {/* Change Password Form */}
             <div className="bg-white rounded-[3rem] p-8 lg:p-12 border border-gray-100 shadow-sm space-y-8 relative overflow-hidden">
+               {/* Status Message */}
+               {status && (
+                 <div className={`p-4 rounded-2xl border flex items-center gap-3 animate-fade-in ${status.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-600'}`}>
+                   {status.type === 'success' ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <AlertTriangle className="w-5 h-5 flex-shrink-0" />}
+                   <p className="text-xs font-bold">{status.message}</p>
+                 </div>
+               )}
+
                <div className="space-y-6">
                   {/* Current Password */}
                   <div className="space-y-2">
@@ -79,10 +120,13 @@ export default function ChangePasswordPage() {
                         <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                         <input 
                            type={showPassword.current ? 'text' : 'password'} 
+                           value={currentPassword}
+                           onChange={(e) => setCurrentPassword(e.target.value)}
                            className="w-full pl-14 pr-12 py-5 bg-gray-50 border border-gray-100 rounded-3xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-4 focus:ring-primary-50 focus:border-primary-100 transition-all shadow-inner"
                            placeholder="••••••••••••"
                         />
                         <button 
+                           type="button"
                            onClick={() => toggleVisibility('current')}
                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
                         >
@@ -98,10 +142,13 @@ export default function ChangePasswordPage() {
                         <ShieldCheck className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                         <input 
                            type={showPassword.new ? 'text' : 'password'} 
+                           value={newPassword}
+                           onChange={(e) => setNewPassword(e.target.value)}
                            className="w-full pl-14 pr-12 py-5 bg-gray-50 border border-gray-100 rounded-3xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-4 focus:ring-primary-50 focus:border-primary-100 transition-all shadow-inner"
-                           placeholder="Minimal 8 karakter"
+                           placeholder="Minimal 6 karakter"
                         />
                         <button 
+                           type="button"
                            onClick={() => toggleVisibility('new')}
                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
                         >
@@ -117,10 +164,13 @@ export default function ChangePasswordPage() {
                         <ShieldAlert className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                         <input 
                            type={showPassword.confirm ? 'text' : 'password'} 
+                           value={confirmPassword}
+                           onChange={(e) => setConfirmPassword(e.target.value)}
                            className="w-full pl-14 pr-12 py-5 bg-gray-50 border border-gray-100 rounded-3xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-4 focus:ring-primary-50 focus:border-primary-100 transition-all shadow-inner"
                            placeholder="Ulangi password baru"
                         />
                         <button 
+                           type="button"
                            onClick={() => toggleVisibility('confirm')}
                            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
                         >
