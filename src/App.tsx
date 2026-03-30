@@ -19,6 +19,7 @@ import AcademyPage from './pages/AcademyPage';
 import ProfilePage from './pages/ProfilePage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+// removed ProfileCheckOverlay from here as it is now in ProtectedRoute
 
 function LandingPage() {
   return (

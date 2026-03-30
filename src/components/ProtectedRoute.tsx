@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import ProfileCheckOverlay from './ProfileCheckOverlay';
 
 export default function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -18,5 +19,10 @@ export default function ProtectedRoute() {
     return <Navigate to="/login" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <ProfileCheckOverlay />
+      <Outlet />
+    </>
+  );
 }

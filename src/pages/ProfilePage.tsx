@@ -158,6 +158,28 @@ export default function ProfilePage() {
         </header>
 
         <main className="max-w-4xl mx-auto p-6 lg:p-10 w-full">
+          {/* Profile Completion Alert */}
+          {(!formData.address || formData.address === '-' || !formData.whatsapp) && (
+            <div className="mb-10 bg-gradient-to-r from-orange-500 to-orange-600 rounded-[2rem] p-8 text-white shadow-xl shadow-orange-200 relative overflow-hidden group">
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20">
+                    <AlertTriangle className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black tracking-tight">Profil Anda Belum Lengkap</h3>
+                    <p className="text-orange-100 text-sm font-medium">Lengkapi WhatsApp dan Alamat untuk membuka akses fitur Academy & Dashboard.</p>
+                  </div>
+                </div>
+                <div className="bg-white/20 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-white/20">
+                  Aksi Diperlukan
+                </div>
+              </div>
+              {/* Decorative Circle */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-10 -translate-y-10 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+            </div>
+          )}
+
           {/* Status Message */}
           {saveStatus && (
             <div className={`mb-6 p-4 rounded-2xl border flex items-center gap-3 animate-fade-in ${saveStatus.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-600'}`}>
