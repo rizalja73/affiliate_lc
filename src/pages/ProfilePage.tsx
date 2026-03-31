@@ -36,6 +36,13 @@ export default function ProfilePage() {
     birthDate: ''
   });
 
+  const [totalKomisi, setTotalKomisi] = useState<number>(0);
+  const [isLoadingKomisi, setIsLoadingKomisi] = useState(true);
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
+  };
+
   // Fetch data on mount
   useEffect(() => {
     if (!user) return;
@@ -50,7 +57,10 @@ export default function ProfilePage() {
 
         if (error && error.code !== 'PGRST116') throw error; 
 
+        let userUsername = user?.user_metadata?.username || user?.email?.split('@')[0] || 'member';
+
         if (data) {
+          userUsername = data.username || userUsername;
           setFormData({
             username: data.username || user?.user_metadata?.username || '',
             firstName: data.first_name || user?.user_metadata?.first_name || '',
@@ -61,6 +71,39 @@ export default function ProfilePage() {
             birthDate: data.birth_date || ''
           });
         }
+
+        // Fetch commissions
+        try {
+          const response = await fetch(`https://lampungcerdas.com/api/produks/orders?referral=${userUsername}`, {
+            method: 'GET',
+            headers: {
+              'x-api-key': import.meta.env.VITE_PRODUCTS_API_KEY,
+              'Content-Type': 'application/json'
+            }
+          });
+          const result = await response.json();
+          if (result.success) {
+            const rawOrders = result.data?.data || result.data || [];
+            let komisi = 0;
+            rawOrders.forEach((o: any) => {
+              const status = (o.status || '').toLowerCase();
+              if (status === 'success' || status === 'completed' || status === 'lunas' || status === 'sukses') {
+                let komisiNum = 0;
+                if (o.produk?.komisi) {
+                  const rawKomisiStr = (o.produk.komisi || '0').toString();
+                  komisiNum = parseInt(rawKomisiStr.replace(/[^0-9]/g, ''), 10) || 0;
+                }
+                komisi += komisiNum;
+              }
+            });
+            setTotalKomisi(komisi);
+          }
+        } catch (err) {
+          console.error('Error fetching commission:', err);
+        } finally {
+          setIsLoadingKomisi(false);
+        }
+
       } catch (err: any) {
         console.error('Error loading profile:', err);
       }
@@ -214,7 +257,9 @@ export default function ProfilePage() {
 
                   <div className="md:ml-auto flex flex-col items-center md:items-end gap-2">
                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Komisi</div>
-                     <div className="text-2xl font-black text-primary-600 tracking-tight">Rp 2.450.000</div>
+                     <div className={`text-2xl font-black text-primary-600 tracking-tight ${isLoadingKomisi ? 'animate-pulse' : ''}`}>
+                       {isLoadingKomisi ? 'Menghitung...' : formatCurrency(totalKomisi)}
+                     </div>
                   </div>
                </div>
                

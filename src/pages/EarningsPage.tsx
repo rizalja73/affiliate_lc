@@ -35,6 +35,7 @@ import Button from '../components/Button';
 import FloatingActionMenu from '../components/FloatingActionMenu';
 import ProfileDropdown from '../components/ProfileDropdown';
 import Sidebar from '../components/Sidebar';
+import WithdrawalModal from '../components/WithdrawalModal';
 
 export default function EarningsPage() {
   const navigate = useNavigate();
@@ -44,14 +45,16 @@ export default function EarningsPage() {
   const [activeTab, setActiveTab] = useState<'pendapatan' | 'penjualan'>('pendapatan');
 
   // Page State
-  const [activeFilter, setActiveFilter] = useState<'semua' | 'tertunda' | 'terkirim' | 'batal'>('semua');
+  const [activeFilter, setActiveFilter] = useState<'semua' | 'pending' | 'sukses' | 'failed'>('semua');
   const [isCalling, setIsCalling] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTxId, setExpandedTxId] = useState<number | null>(null);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
 
   // Data State
   const [orders, setOrders] = useState<any[]>([]);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [totalBalance, setTotalBalance] = useState(0);
   const [activeSalesView, setActiveSalesView] = useState<'produk' | 'audiens'>('produk');
   const [salesStats, setSalesStats] = useState({
@@ -79,23 +82,24 @@ export default function EarningsPage() {
     return s === 'batal' || s === 'failed' || s === 'cancelled' || s === 'gagal';
   };
 
-  // Derived Transactions for "Riwayat Penghasilan"
-  const transactions = orders.map(o => {
-    let status: 'terkirim' | 'tertunda' | 'batal' = 'tertunda';
-    if (isStatusSuccess(o.status)) status = 'terkirim';
-    if (isStatusFailed(o.status)) status = 'batal';
+  // Derived Transactions for "Riwayat Penarikan"
+  const transactions = withdrawals.map(w => {
+    let status: 'sukses' | 'pending' | 'failed' = 'pending';
+    const s = w.status?.toLowerCase() || '';
+    if (['completed', 'success', 'sukses', 'terkirim', 'lunas'].includes(s)) status = 'sukses';
+    else if (['rejected', 'failed', 'batal', 'gagal', 'cancelled'].includes(s)) status = 'failed';
 
     return {
-      id: o.id,
-      type: 'Komisi Penjualan',
-      amount: formatCurrency(o.komisi || 0),
-      rawAmount: o.komisi || 0,
+      id: w.id,
+      type: 'Penarikan Komisi',
+      amount: formatCurrency(w.amount || 0),
+      rawAmount: w.amount || 0,
       status: status,
-      date: o.date,
-      product: o.name,
-      email: o.email || '-',
-      phone: o.phone || '-',
-      buyerName: o.buyerName || '-'
+      date: new Date(w.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      bankName: w.bank_name || '-',
+      accountNumber: w.account_number || '-',
+      accountName: w.account_name || '-',
+      product: `Bank ${w.bank_name || '-'}`
     };
   });
 
@@ -107,7 +111,7 @@ export default function EarningsPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
-      
+
       try {
         setLoading(true);
         setError(null);
@@ -118,7 +122,7 @@ export default function EarningsPage() {
           .select('username')
           .eq('user_id', user.id)
           .single();
-        
+
         const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'member';
 
         // 2. Fetch Orders from API
@@ -138,8 +142,8 @@ export default function EarningsPage() {
             // Parse komisi if string
             let komisiNum = 0;
             if (o.produk?.komisi) {
-               const rawKomisiStr = (o.produk.komisi || '0').toString();
-               komisiNum = parseInt(rawKomisiStr.replace(/[^0-9]/g, ''), 10) || 0;
+              const rawKomisiStr = (o.produk.komisi || '0').toString();
+              komisiNum = parseInt(rawKomisiStr.replace(/[^0-9]/g, ''), 10) || 0;
             }
 
             return {
@@ -161,13 +165,13 @@ export default function EarningsPage() {
           const balance = formatted
             .filter((o: any) => isStatusSuccess(o.status))
             .reduce((acc: number, curr: any) => acc + curr.komisi, 0);
-          
+
           setTotalBalance(balance);
 
           // Update Sales Stats
           const totalQty = formatted.reduce((acc: number, curr: any) => acc + curr.qty, 0);
           const paidOrders = formatted.filter((o: any) => isStatusSuccess(o.status));
-          
+
           setSalesStats({
             totalSold: totalQty,
             lastUpdate: formatted.length > 0 ? formatted[0].date : 'Belum ada data',
@@ -182,6 +186,23 @@ export default function EarningsPage() {
           });
         } else {
           setError('Gagal memuat data dari pusat.');
+        }
+
+        // 3. Fetch Withdrawals from Supabase
+        const { data: withdrawalsData, error: withdrawalsError } = await supabase
+          .from('data_penarikan')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (!withdrawalsError && withdrawalsData) {
+          setWithdrawals(withdrawalsData);
+          
+          const totalWithdrawn = withdrawalsData
+            .filter((w: any) => !['rejected', 'batal', 'failed', 'gagal', 'cancelled'].includes(w.status?.toLowerCase() || ''))
+            .reduce((acc: number, curr: any) => acc + (Number(curr.amount) || 0), 0);
+
+          setTotalBalance(prev => Math.max(0, prev - totalWithdrawn));
         }
       } catch (err: any) {
         console.error('Fetch error:', err);
@@ -204,18 +225,18 @@ export default function EarningsPage() {
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case 'terkirim': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-      case 'tertunda': return 'bg-amber-50 text-amber-600 border-amber-100';
-      case 'batal': return 'bg-red-50 text-red-600 border-red-100';
+      case 'sukses': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case 'pending': return 'bg-amber-50 text-amber-600 border-amber-100';
+      case 'failed': return 'bg-red-50 text-red-600 border-red-100';
       default: return 'bg-gray-50 text-gray-600 border-gray-100';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'terkirim': return <CheckCircle2 className="w-4 h-4" />;
-      case 'tertunda': return <Clock className="w-4 h-4" />;
-      case 'batal': return <XCircle className="w-4 h-4" />;
+      case 'sukses': return <CheckCircle2 className="w-4 h-4" />;
+      case 'pending': return <Clock className="w-4 h-4" />;
+      case 'failed': return <XCircle className="w-4 h-4" />;
       default: return null;
     }
   };
@@ -252,7 +273,7 @@ export default function EarningsPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="hidden md:flex items-center gap-3">
               <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-gray-100 transition-colors">
                 <CreditCard className="w-4 h-4" />
@@ -268,16 +289,16 @@ export default function EarningsPage() {
 
         <main className="max-w-7xl mx-auto p-6 lg:p-10 space-y-10 w-full animate-fade-in" key={activeTab}>
           {loading ? (
-             <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
-                <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-                <p className="font-black text-gray-400 uppercase tracking-widest">Sinkronisasi Data...</p>
-             </div>
+            <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+              <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
+              <p className="font-black text-gray-400 uppercase tracking-widest">Sinkronisasi Data...</p>
+            </div>
           ) : error ? (
             <div className="bg-red-50 p-12 rounded-[3.5rem] border border-red-100 text-center space-y-4">
-               <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
-               <h3 className="text-xl font-black text-red-900">Koneksi Gagal</h3>
-               <p className="text-red-700 font-medium">{error}</p>
-               <Button variant="outline" onClick={() => window.location.reload()}>Coba Lagi</Button>
+              <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
+              <h3 className="text-xl font-black text-red-900">Koneksi Gagal</h3>
+              <p className="text-red-700 font-medium">{error}</p>
+              <Button variant="outline" onClick={() => window.location.reload()}>Coba Lagi</Button>
             </div>
           ) : activeTab === 'pendapatan' ? (
             <>
@@ -299,11 +320,16 @@ export default function EarningsPage() {
                   </div>
 
                   <div className="flex flex-col gap-4">
-                    <Button size="xl" variant="white" className="text-emerald-700 border-none px-12 py-6 rounded-[2rem] shadow-2xl shadow-emerald-900/20 font-black text-lg group">
+                    <Button
+                      size="xl"
+                      variant="white"
+                      onClick={() => setIsWithdrawModalOpen(true)}
+                      className="text-emerald-700 border-none px-12 py-6 rounded-[2rem] shadow-2xl shadow-emerald-900/20 font-black text-lg group"
+                    >
                       Tarik Saldo
                       <ArrowUpRight className="ml-2 w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </Button>
-                    <p className="text-[10px] text-center text-emerald-100 font-bold uppercase tracking-[0.2em] opacity-60">Minimal penarikan Rp 100.000</p>
+                    <p className="text-[10px] text-center text-emerald-100 font-bold uppercase tracking-[0.2em] opacity-60">Minimal penarikan Rp 10.000</p>
                   </div>
                 </div>
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
@@ -317,7 +343,7 @@ export default function EarningsPage() {
                       <History className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-black text-gray-900 tracking-tight">Riwayat Penghasilan</h3>
+                      <h3 className="text-2xl font-black text-gray-900 tracking-tight">Riwayat Penarikan</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
                           <Info className="w-3 h-3 text-primary-400" /> Keterangan Status:
@@ -329,9 +355,9 @@ export default function EarningsPage() {
                   <div className="flex flex-wrap p-1.5 bg-gray-100 rounded-2xl w-fit border border-gray-200">
                     {[
                       { id: 'semua', label: 'Semua' },
-                      { id: 'tertunda', label: 'Tertunda' },
-                      { id: 'terkirim', label: 'Terkirim' },
-                      { id: 'batal', label: 'Batal' }
+                      { id: 'pending', label: 'Pending' },
+                      { id: 'sukses', label: 'Sukses' },
+                      { id: 'failed', label: 'Failed' }
                     ].map((f) => (
                       <button
                         key={f.id}
@@ -379,7 +405,7 @@ export default function EarningsPage() {
                                   <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${getStatusStyle(t.status)}`}>
                                     {t.status}
                                   </span>
-                                  <button 
+                                  <button
                                     onClick={() => setExpandedTxId(expandedTxId === t.id ? null : t.id)}
                                     className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-all ${expandedTxId === t.id ? 'text-primary-600 bg-primary-50 px-2 py-1 rounded-md' : 'text-gray-400 hover:text-primary-600'}`}
                                   >
@@ -398,29 +424,29 @@ export default function EarningsPage() {
                                   <div className="grid md:grid-cols-3 gap-6">
                                     <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
                                       <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                                        <CreditCard className="w-5 h-5" />
+                                      </div>
+                                      <div>
+                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Bank Tujuan</div>
+                                        <div className="font-bold text-gray-900">{t.bankName}</div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
+                                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                                        <CreditCard className="w-5 h-5" />
+                                      </div>
+                                      <div>
+                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">No. Rekening</div>
+                                        <div className="font-bold text-gray-900 font-mono">{t.accountNumber}</div>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
+                                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
                                         <Users className="w-5 h-5" />
                                       </div>
                                       <div>
-                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Nama Pendaftar</div>
-                                        <div className="font-bold text-gray-900">{t.buyerName}</div>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
-                                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
-                                        <Mail className="w-5 h-5" />
-                                      </div>
-                                      <div>
-                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Email Pendaftar</div>
-                                        <div className="font-bold text-gray-900">{t.email}</div>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-primary-100/50">
-                                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
-                                        <Phone className="w-5 h-5" />
-                                      </div>
-                                      <div>
-                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Nomor WhatsApp</div>
-                                        <div className="font-bold text-gray-900">{t.phone}</div>
+                                        <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Atas Nama</div>
+                                        <div className="font-bold text-gray-900">{t.accountName}</div>
                                       </div>
                                     </div>
                                   </div>
@@ -600,7 +626,7 @@ export default function EarningsPage() {
                         <h3 className="text-2xl font-black text-gray-900">Analisis Funnel</h3>
                         <p className="text-gray-500 font-medium">Data real-time dari performa link afiliasi Anda.</p>
                       </div>
-                      
+
                       <div className="space-y-6">
                         {[
                           { step: 'Kunjungan Link (Est)', value: audienceData.clicks, width: '100%', color: 'bg-primary-600' },
@@ -630,6 +656,12 @@ export default function EarningsPage() {
         </main>
 
         <FloatingActionMenu />
+
+        <WithdrawalModal
+          isOpen={isWithdrawModalOpen}
+          onClose={() => setIsWithdrawModalOpen(false)}
+          balance={totalBalance}
+        />
       </div>
     </div>
   );
