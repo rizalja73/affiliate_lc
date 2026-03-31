@@ -39,6 +39,14 @@ export default function WithdrawalModal({ isOpen, onClose, balance }: Withdrawal
 
   const minWithdrawal = 10000;
 
+  // Auto dismiss error toast
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(''), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   // Load bank from Supabase on mount
   useEffect(() => {
     if (isOpen && user) {
@@ -182,6 +190,18 @@ export default function WithdrawalModal({ isOpen, onClose, balance }: Withdrawal
       
       {/* Modal Content */}
       <div className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]">
+        
+        {/* Floating Error Toast */}
+        <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-[110] w-[90%] transition-all duration-500 transform ${error ? 'translate-y-0 opacity-100 pointer-events-auto' : 'translate-y-10 opacity-0 pointer-events-none'}`}>
+          <div className="bg-red-600/95 backdrop-blur-md text-white p-4 rounded-2xl flex items-center gap-3 shadow-2xl shadow-red-900/30 border border-red-500/50">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-100" />
+            <p className="text-sm font-bold leading-tight">{error}</p>
+            <button onClick={() => setError('')} className="ml-auto flex-shrink-0 bg-white/20 hover:bg-white/30 p-1.5 rounded-lg transition-colors">
+              <X className="w-4 h-4 text-white" />
+            </button>
+          </div>
+        </div>
+
         {step !== 'processing' && step !== 'success' && (
           <div className="flex items-center justify-between p-6 lg:p-8 border-b border-gray-100">
             <div>
@@ -210,13 +230,6 @@ export default function WithdrawalModal({ isOpen, onClose, balance }: Withdrawal
                   <Wallet className="w-6 h-6" />
                 </div>
               </div>
-
-              {error && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl flex items-center gap-3 text-sm font-bold border border-red-100">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  {error}
-                </div>
-              )}
 
               {/* Amount Input */}
               <div className="space-y-3">

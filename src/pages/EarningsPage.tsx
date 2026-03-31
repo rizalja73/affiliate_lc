@@ -25,7 +25,8 @@ import {
   Mail,
   Phone,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Sparkles
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -74,12 +75,6 @@ export default function EarningsPage() {
     if (!status) return false;
     const s = status.toLowerCase();
     return s === 'success' || s === 'completed' || s === 'lunas' || s === 'sukses';
-  };
-
-  const isStatusFailed = (status: string) => {
-    if (!status) return false;
-    const s = status.toLowerCase();
-    return s === 'batal' || s === 'failed' || s === 'cancelled' || s === 'gagal';
   };
 
   // Derived Transactions for "Riwayat Penarikan"
@@ -288,35 +283,38 @@ export default function EarningsPage() {
         </header>
 
         <main className="max-w-7xl mx-auto p-6 lg:p-10 space-y-10 w-full animate-fade-in" key={activeTab}>
-          {loading ? (
-            <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
-              <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
-              <p className="font-black text-gray-400 uppercase tracking-widest">Sinkronisasi Data...</p>
-            </div>
-          ) : error ? (
-            <div className="bg-red-50 p-12 rounded-[3.5rem] border border-red-100 text-center space-y-4">
-              <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
-              <h3 className="text-xl font-black text-red-900">Koneksi Gagal</h3>
-              <p className="text-red-700 font-medium">{error}</p>
-              <Button variant="outline" onClick={() => window.location.reload()}>Coba Lagi</Button>
-            </div>
-          ) : activeTab === 'pendapatan' ? (
+          {activeTab === 'pendapatan' ? (
             <>
               {/* Balance Section */}
               <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-[3rem] p-10 lg:p-14 text-white shadow-2xl shadow-emerald-200">
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
-                  <div className="space-y-4">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest border border-white/20">
-                      <Wallet className="w-3.5 h-3.5" />
-                      Saldo Tersedia
+                  <div className="space-y-6">
+                    {loading ? (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 animate-pulse">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                        Sinkronisasi Data...
+                      </div>
+                    ) : error ? (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 hover:bg-red-400 cursor-pointer transition-colors" onClick={() => window.location.reload()}>
+                        <AlertCircle className="w-3.5 h-3.5 text-white" />
+                        Oops! {error} (Tap Refresh)
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">
+                        <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+                        Data Akurat & Terkini
+                      </div>
+                    )}
+                    
+                    <div>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest border border-white/20 mb-4">
+                        <Wallet className="w-3.5 h-3.5" />
+                        Saldo Tersedia
+                      </div>
+                      <div className="text-5xl lg:text-7xl font-black tracking-tight">
+                        {loading ? '...' : formatCurrency(totalBalance)}
+                      </div>
                     </div>
-                    <div className="text-5xl lg:text-7xl font-black tracking-tight">
-                      {formatCurrency(totalBalance)}
-                    </div>
-                    <p className="text-emerald-100/70 font-medium flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Data tersinkronisasi otomatis
-                    </p>
                   </div>
 
                   <div className="flex flex-col gap-4">

@@ -116,8 +116,8 @@ export default function ProfilePage() {
     if (!user) return;
     
     // Validasi Field NOT NULL
-    if (!formData.username.trim() || !formData.firstName.trim() || !formData.whatsapp.trim() || !formData.address.trim()) {
-       setSaveStatus({ type: 'error', message: 'Tolong lengkapi: Username, Nama Depan, WhatsApp, dan Alamat.' });
+    if (!formData.firstName.trim() || !formData.whatsapp.trim() || !formData.address.trim()) {
+       setSaveStatus({ type: 'error', message: 'Tolong lengkapi: Nama Depan, WhatsApp, dan Alamat.' });
        return;
     }
 
@@ -286,8 +286,8 @@ export default function ProfilePage() {
                            <input 
                               type="text" 
                               value={formData.username}
-                              onChange={(e) => setFormData({...formData, username: e.target.value})}
-                              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all font-mono"
+                              disabled
+                              className="w-full pl-12 pr-4 py-4 bg-gray-100 border border-gray-100 rounded-2xl text-sm font-bold text-gray-400 outline-none cursor-not-allowed font-mono"
                            />
                         </div>
                      </div>

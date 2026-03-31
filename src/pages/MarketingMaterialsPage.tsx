@@ -11,9 +11,10 @@ import {
   CheckCircle2,
   PlayCircle,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Search
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import FloatingActionMenu from '../components/FloatingActionMenu';
@@ -25,6 +26,29 @@ export default function MarketingMaterialsPage() {
   const [materials, setMaterials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>('Semua');
+
+  const filteredMaterials = useMemo(() => {
+    if (activeFilter === 'Semua') return materials;
+    return materials.filter(item => {
+      const typeStr = item.type?.toLowerCase() || '';
+      const titleStr = item.title?.toLowerCase() || '';
+      
+      if (activeFilter === 'Video') return typeStr === 'video' || titleStr.includes('video');
+      if (activeFilter === 'Gambar') return titleStr.includes('banner') || titleStr.includes('gambar') || titleStr.includes('poster');
+      if (activeFilter === 'Testimoni') return titleStr.includes('testimoni');
+      if (activeFilter === 'Dokumen') return titleStr.includes('copywriting') || titleStr.includes('skrip') || titleStr.includes('caption');
+      return true;
+    });
+  }, [materials, activeFilter]);
+
+  const categories = [
+    { id: 'Semua', label: 'Semua Aset', icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'Gambar', label: 'Gambar', icon: <ImageIcon className="w-4 h-4" /> },
+    { id: 'Video', label: 'Video', icon: <Video className="w-4 h-4" /> },
+    { id: 'Testimoni', label: 'Testimoni', icon: <Share2 className="w-4 h-4" /> },
+    { id: 'Dokumen', label: 'Copywriting', icon: <FileText className="w-4 h-4" /> }
+  ];
 
   useEffect(() => {
     const fetchMaterials = async () => {
@@ -43,19 +67,25 @@ export default function MarketingMaterialsPage() {
         if (result.success) {
           const rawData = result.data?.data || result.data || [];
           const formatted = rawData.map((item: any) => {
-            // Determine icon and color based on type/title
-            let icon = <FileText className="w-8 h-8 text-amber-500" />;
+            let icon = <FileText className="w-5 h-5 text-amber-500" />;
             let bgColor = 'bg-amber-50';
+            let coverImage = 'https://images.unsplash.com/photo-1455390582262-044cdead27d8?q=80&w=1000&auto=format&fit=crop';
             
-            if (item.type === 'video' || item.title?.toLowerCase().includes('video')) {
-              icon = <Video className="w-8 h-8 text-rose-500" />;
+            const titleStr = item.title?.toLowerCase() || '';
+            const typeStr = item.type?.toLowerCase() || '';
+
+            if (typeStr === 'video' || titleStr.includes('video')) {
+              icon = <Video className="w-5 h-5 text-rose-500" />;
               bgColor = 'bg-rose-50';
-            } else if (item.title?.toLowerCase().includes('testimoni')) {
-              icon = <Share2 className="w-8 h-8 text-emerald-500" />;
+              coverImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop';
+            } else if (titleStr.includes('testimoni')) {
+              icon = <Share2 className="w-5 h-5 text-emerald-500" />;
               bgColor = 'bg-emerald-50';
-            } else if (item.title?.toLowerCase().includes('banner') || item.title?.toLowerCase().includes('gambar')) {
-              icon = <ImageIcon className="w-8 h-8 text-blue-500" />;
+              coverImage = 'https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1000&auto=format&fit=crop';
+            } else if (titleStr.includes('banner') || titleStr.includes('gambar') || titleStr.includes('poster') || titleStr.includes('story')) {
+              icon = <ImageIcon className="w-5 h-5 text-blue-500" />;
               bgColor = 'bg-blue-50';
+              coverImage = 'https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=1000&auto=format&fit=crop';
             }
 
             return {
@@ -66,7 +96,8 @@ export default function MarketingMaterialsPage() {
               itemCount: 'Lihat Asset',
               link: item.link,
               color: bgColor,
-              tag: item.produk?.nama || 'General Marketing'
+              tag: item.produk?.nama || 'General Marketing',
+              cover: coverImage
             };
           });
           setMaterials(formatted);
@@ -147,15 +178,22 @@ export default function MarketingMaterialsPage() {
                <div className="relative z-10 bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/10 shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500">
                   <div className="flex items-center gap-4 mb-6">
                      <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
-                        <PlayCircle className="w-8 h-8 text-primary-400" />
+                        <ImageIcon className="w-8 h-8 text-primary-400" />
                      </div>
                      <div>
-                        <div className="text-sm font-black">Video Iklan Terbaru</div>
+                        <div className="text-sm font-black">Aset Promosi Terbaru</div>
                         <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Update Otomatis</div>
                      </div>
                   </div>
-                  <div className="w-full h-40 bg-gray-800 rounded-2xl overflow-hidden mb-6 flex items-center justify-center border border-white/5">
-                     <Video className="w-12 h-12 text-white/20" />
+                  <div className="w-full h-40 bg-gray-800 rounded-2xl overflow-hidden mb-6 relative group border border-white/5">
+                     <img 
+                       src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" 
+                       alt="Latest Material" 
+                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                     />
+                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent flex flex-col justify-end p-4">
+                        <span className="px-2 py-0.5 w-fit bg-primary-500/80 backdrop-blur-md rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg">New</span>
+                     </div>
                   </div>
                   <Button variant="glass" size="sm" className="w-full font-black text-[10px] uppercase tracking-widest border-white/10">
                     Akses Mudah
@@ -168,67 +206,119 @@ export default function MarketingMaterialsPage() {
         </section>
 
         {/* Marketing Materials Grid */}
-        <section className="space-y-8">
-          <div className="flex items-center justify-between px-4">
-             <h3 className="text-2xl font-black text-gray-900 tracking-tight">Katalog Aset Promosi</h3>
-             <p className="hidden md:block text-sm font-bold text-gray-500 italic">Klik kartu untuk membuka folder Drive</p>
+        <section className="space-y-8 animate-fade-in">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-4">
+             <div className="space-y-1">
+               <h3 className="text-2xl font-black text-gray-900 tracking-tight">Katalog Aset Promosi</h3>
+               <p className="text-sm font-bold text-gray-500 italic">Klik kartu untuk mengunduh aset via Google Drive</p>
+             </div>
+             
+             {/* Filter Tabs */}
+             <div className="flex flex-wrap p-1.5 bg-white shadow-sm rounded-2xl w-fit border border-gray-100 overflow-x-auto max-w-full lg:max-w-none no-scrollbar">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveFilter(cat.id)}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                      activeFilter === cat.id
+                        ? 'bg-primary-50 text-primary-600 shadow-sm border border-primary-100 scale-105'
+                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {cat.icon}
+                    {cat.label}
+                  </button>
+                ))}
+             </div>
           </div>
 
           {loading ? (
-             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] border border-gray-100">
-                <Loader2 className="w-12 h-12 text-primary-600 animate-spin mb-4" />
-                <p className="font-black text-gray-400 uppercase tracking-widest">Mengunduh Aset...</p>
+             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                  <div key={i} className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm h-[320px] animate-pulse flex flex-col justify-between">
+                     <div className="w-16 h-16 bg-gray-100 rounded-2xl mb-6"></div>
+                     <div className="space-y-3">
+                        <div className="w-3/4 h-6 bg-gray-100 rounded-lg"></div>
+                        <div className="w-full h-12 bg-gray-50 rounded-lg"></div>
+                     </div>
+                     <div className="w-full h-10 bg-gray-50 rounded-xl mt-8"></div>
+                  </div>
+                ))}
              </div>
           ) : error ? (
-            <div className="bg-red-50 p-12 rounded-[3.5rem] border border-red-100 text-center space-y-4">
+            <div className="bg-red-50 p-12 rounded-[3.5rem] border border-red-100 text-center space-y-4 shadow-sm">
                <AlertCircle className="w-16 h-16 text-red-600 mx-auto" />
-               <h3 className="text-xl font-black text-red-900">Gagal Memuat</h3>
+               <h3 className="text-xl font-black text-red-900">Koneksi Gagal</h3>
                <p className="text-red-700 font-medium">{error}</p>
                <Button variant="outline" onClick={() => window.location.reload()}>Coba Lagi</Button>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {materials.map((item) => (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {filteredMaterials.map((item, idx) => (
                 <a 
                   key={item.id} 
                   href={item.link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="group relative bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-primary-100/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden"
+                  style={{ animationDelay: `${idx * 50}ms` }}
+                  className="group relative bg-white rounded-[2.5rem] p-4 border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-primary-100/50 hover:-translate-y-2 transition-all duration-500 overflow-hidden flex flex-col justify-between h-full animate-fade-in-up"
                 >
-                  <div className={`${item.color} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
-                    {item.icon}
-                  </div>
-                  
-                  <div className="absolute top-8 right-8">
-                     <span className="px-3 py-1 bg-primary-50 text-primary-600 text-[10px] font-black rounded-lg border border-primary-100 uppercase tracking-widest group-hover:bg-primary-600 group-hover:text-white transition-colors">
-                       {item.tag}
-                     </span>
+                  <div className="flex flex-col flex-1">
+                    <div className="relative w-full h-48 rounded-[2rem] overflow-hidden mb-6 shadow-sm group-hover:shadow-lg transition-all shrink-0">
+                      <img 
+                        src={item.cover} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-gray-900/10 to-transparent"></div>
+
+                      <div className="absolute top-4 right-4 z-10">
+                        <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center shadow-lg backdrop-blur-md bg-white/90`}>
+                          {item.icon}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 px-2 flex-1 flex flex-col">
+                      <div className="flex items-center">
+                        <span className="px-3 py-1 bg-gradient-to-r from-primary-50 to-primary-100/50 text-primary-700 text-[10px] font-black rounded-lg border border-primary-200 uppercase tracking-widest truncate max-w-full">
+                          {item.tag}
+                        </span>
+                      </div>
+                      <h4 className="text-lg font-black text-gray-900 group-hover:text-primary-600 transition-colors leading-snug line-clamp-2">
+                        {item.title}
+                      </h4>
+                      <p className="text-sm text-gray-500 font-medium leading-relaxed line-clamp-2">
+                        {item.description && item.description !== '-' && item.description !== 'undefined' ? item.description : 'Aset promosi siap pakai untuk membantu Anda meningkatkan penjualan produk.'}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <h4 className="text-lg font-black text-gray-900 group-hover:text-primary-600 transition-colors leading-tight">{item.title}</h4>
-                    <p className="text-sm text-gray-500 font-medium leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-8 flex items-center justify-between">
-                     <div className="text-xs font-black text-gray-400 flex items-center gap-1.5">
-                        <Download className="w-3.5 h-3.5" />
-                        {item.itemCount}
+                  <div className="mt-6 pt-6 border-t border-gray-50 flex items-center justify-between px-2 pb-2 z-10">
+                     <div className="text-[10px] font-black text-gray-400 flex items-center gap-1.5 uppercase tracking-widest group-hover:text-primary-500 transition-colors">
+                        <Download className="w-4 h-4" />
+                        Akses File
                      </div>
-                     <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
-                        <ExternalLink className="w-5 h-5" />
+                     <div className="w-10 h-10 bg-gray-50 rounded-[1rem] flex items-center justify-center text-gray-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-sm group-hover:shadow-md group-hover:-rotate-12">
+                        <ExternalLink className="w-4 h-4" />
                      </div>
                   </div>
-
-                  <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gray-50 rounded-full group-hover:scale-150 transition-transform duration-700 -z-10 group-hover:bg-primary-50"></div>
                 </a>
               ))}
-              {materials.length === 0 && (
-                <div className="col-span-full py-20 text-center text-gray-400 font-black uppercase tracking-widest italic">
-                   Belum ada bahan marketing tersedia.
+              
+              {filteredMaterials.length === 0 && (
+                <div className="col-span-full py-24 text-center bg-gray-50 rounded-[3rem] border border-dashed border-gray-200">
+                   <div className="flex flex-col items-center justify-center gap-6">
+                     <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 shadow-inner">
+                       <Search className="w-10 h-10" />
+                     </div>
+                     <div>
+                       <h3 className="text-xl font-black text-gray-900">Aset Belum Tersedia</h3>
+                       <p className="text-gray-500 font-medium mt-2">Coba filter kategori lain atau kembali nanti untuk update terbaru.</p>
+                     </div>
+                     <Button variant="outline" onClick={() => setActiveFilter('Semua')}>Reset Filter</Button>
+                   </div>
                 </div>
               )}
             </div>
