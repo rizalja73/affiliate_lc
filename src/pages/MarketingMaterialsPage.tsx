@@ -91,6 +91,11 @@ export default function MarketingMaterialsPage() {
               coverImage = 'https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=1000&auto=format&fit=crop';
             }
 
+            // Custom overrides for specific materials requested by user
+            if (titleStr.includes('public speaking') || titleStr.includes('promosi terbaru') || titleStr.includes('video iklan')) {
+              coverImage = '/ps.jpg';
+            }
+
             return {
               id: item.id,
               title: item.title,
@@ -190,7 +195,7 @@ export default function MarketingMaterialsPage() {
                   </div>
                   <div className="w-full h-40 bg-gray-800 rounded-2xl overflow-hidden mb-6 relative group border border-white/5">
                     <img
-                      src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop"
+                      src="/ps.jpg"
                       alt="Latest Material"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />

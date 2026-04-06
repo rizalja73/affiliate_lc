@@ -36,6 +36,8 @@ export default function ProfilePage() {
     birthDate: ''
   });
 
+  const [isUsernameLocked, setIsUsernameLocked] = useState(user?.user_metadata?.is_username_set === true);
+
   const [totalKomisi, setTotalKomisi] = useState<number>(0);
   const [isLoadingKomisi, setIsLoadingKomisi] = useState(true);
 
@@ -70,6 +72,11 @@ export default function ProfilePage() {
             address: data.address || '',
             birthDate: data.birth_date || ''
           });
+          // Jika username sudah ada di database dan metadata mengatakan sudah di-set
+          setIsUsernameLocked(user?.user_metadata?.is_username_set === true);
+        } else {
+          // Jika belum ada data di affiliate_profiles, biarkan bisa edit
+          setIsUsernameLocked(false);
         }
 
         // Fetch commissions
@@ -153,14 +160,16 @@ export default function ProfilePage() {
       // 2. Update Auth Metadata
       const { error: authError } = await supabase.auth.updateUser({
         data: {
-          username: formData.username,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
+          username: formData.username.trim(),
+          first_name: formData.firstName.trim(),
+          last_name: formData.lastName.trim(),
+          is_username_set: true // Tandai bahwa username sudah di-set oleh user
         }
       });
 
       if (authError) throw authError;
 
+      setIsUsernameLocked(true); // Kunci input username setelah save berhasil
       setSaveStatus({ type: 'success', message: 'Profil berhasil diperbarui!' });
     } catch (err: any) {
       console.error('Update error:', err);
@@ -280,16 +289,34 @@ export default function ProfilePage() {
 
                   <div className="space-y-6">
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
-                        <div className="relative group">
-                           <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
-                           <input 
-                              type="text" 
-                              value={formData.username}
-                              disabled
-                              className="w-full pl-12 pr-4 py-4 bg-gray-100 border border-gray-100 rounded-2xl text-sm font-bold text-gray-400 outline-none cursor-not-allowed font-mono"
-                           />
+                        <div className="flex items-center justify-between">
+                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
+                           {isUsernameLocked && (
+                              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-tighter bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                                Sudah Disetel
+                              </span>
+                           )}
+                           {!isUsernameLocked && (
+                               <span className="text-[8px] font-black text-amber-500 uppercase tracking-tighter bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 animate-pulse">
+                                 Bisa Diubah Sekali
+                               </span>
+                           )}
                         </div>
+                         <div className="relative group">
+                            <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                            <input 
+                               type="text" 
+                               value={formData.username}
+                               onChange={(e) => !isUsernameLocked && setFormData({...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '_')})}
+                               disabled={isUsernameLocked}
+                               placeholder="username_anda"
+                               className={`w-full pl-12 pr-4 py-4 rounded-2xl text-sm font-bold outline-none transition-all font-mono ${
+                                 isUsernameLocked 
+                                 ? "bg-gray-100 border-gray-100 text-gray-400 cursor-not-allowed" 
+                                 : "bg-gray-50 border-gray-100 text-gray-700 focus:bg-white focus:ring-2 focus:ring-primary-100"
+                               }`}
+                            />
+                         </div>
                      </div>
 
                      <div className="space-y-2">
