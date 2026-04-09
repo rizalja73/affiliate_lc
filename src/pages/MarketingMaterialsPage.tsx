@@ -72,7 +72,7 @@ export default function MarketingMaterialsPage() {
           const formatted = rawData.map((item: any) => {
             let icon = <FileText className="w-5 h-5 text-amber-500" />;
             let bgColor = 'bg-amber-50';
-            let coverImage = 'https://images.unsplash.com/photo-1455390582262-044cdead27d8?q=80&w=1000&auto=format&fit=crop';
+            let coverImage = '/bahan marketing gemini.png';
 
             const titleStr = item.title?.toLowerCase() || '';
             const typeStr = item.type?.toLowerCase() || '';
@@ -80,18 +80,18 @@ export default function MarketingMaterialsPage() {
             if (typeStr === 'video' || titleStr.includes('video')) {
               icon = <Video className="w-5 h-5 text-rose-500" />;
               bgColor = 'bg-rose-50';
-              coverImage = 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop';
+              coverImage = '/ps.jpg';
             } else if (titleStr.includes('testimoni')) {
               icon = <Share2 className="w-5 h-5 text-emerald-500" />;
               bgColor = 'bg-emerald-50';
-              coverImage = 'https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1000&auto=format&fit=crop';
+              coverImage = '/bahan marketing gemini.png';
             } else if (titleStr.includes('banner') || titleStr.includes('gambar') || titleStr.includes('poster') || titleStr.includes('story')) {
               icon = <ImageIcon className="w-5 h-5 text-blue-500" />;
               bgColor = 'bg-blue-50';
-              coverImage = 'https://images.unsplash.com/photo-1626785774573-4b799315345d?q=80&w=1000&auto=format&fit=crop';
+              coverImage = '/bahan marketing gemini.png';
             }
 
-            // Custom overrides for specific materials requested by user
+            // Custom overrides for specific materials
             if (titleStr.includes('public speaking') || titleStr.includes('promosi terbaru') || titleStr.includes('video iklan')) {
               coverImage = '/ps.jpg';
             }
@@ -195,7 +195,7 @@ export default function MarketingMaterialsPage() {
                   </div>
                   <div className="w-full h-40 bg-gray-800 rounded-2xl overflow-hidden mb-6 relative group border border-white/5">
                     <img
-                      src="/ps.jpg"
+                      src="/bahan marketing gemini.png"
                       alt="Latest Material"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
