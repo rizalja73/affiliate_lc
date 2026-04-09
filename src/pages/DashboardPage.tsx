@@ -35,9 +35,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [rawOrders, setRawOrders] = useState<any[]>([]);
 
-  const displayName = user?.user_metadata?.first_name 
-    ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
-    : user?.email?.split('@')[0] || 'Member';
+  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Member';
 
   const isStatusSuccess = (status: string) => {
     if (!status) return false;

@@ -22,9 +22,7 @@ export default function ProfileDropdown() {
     navigate('/login');
   };
 
-  const displayName = user?.user_metadata?.first_name 
-    ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
-    : user?.email?.split('@')[0] || 'Member';
+  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Member';
 
   // Handle click outside to close
   useEffect(() => {

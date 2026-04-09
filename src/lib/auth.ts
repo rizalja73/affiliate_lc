@@ -8,8 +8,7 @@ export interface RegisterData {
   email: string;
   password: string;
   // Profil
-  firstName: string;
-  lastName: string;
+  fullName: string;
   whatsapp: string;
   // Alamat
   province: string;
@@ -41,8 +40,8 @@ export async function registerAffiliate(data: RegisterData): Promise<AuthResult>
       options: {
         data: {
           username: data.username,
-          first_name: data.firstName,
-          last_name: data.lastName,
+          full_name: data.fullName,
+          whatsapp: data.whatsapp,
         },
       },
     });
@@ -61,8 +60,7 @@ export async function registerAffiliate(data: RegisterData): Promise<AuthResult>
       .insert({
         user_id: authData.user.id,
         username: data.username,
-        first_name: data.firstName,
-        last_name: data.lastName,
+        full_name: data.fullName,
         whatsapp: data.whatsapp,
         province: data.province,
         regency: data.regency,

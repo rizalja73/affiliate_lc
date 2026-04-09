@@ -28,9 +28,8 @@ export default function ProfilePage() {
 
   const [formData, setFormData] = useState({
     username: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
-    firstName: user?.user_metadata?.first_name || '',
-    lastName: user?.user_metadata?.last_name || '',
-    whatsapp: '',
+    fullName: user?.user_metadata?.full_name || user?.user_metadata?.first_name || '',
+    whatsapp: user?.user_metadata?.whatsapp || '',
     province: '-', // Default provided in SQL schema NOT NULL
     address: '',
     birthDate: ''
@@ -44,6 +43,19 @@ export default function ProfilePage() {
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
   };
+
+  // Sync formData with user metadata as soon as user is loaded
+  useEffect(() => {
+    if (user?.user_metadata) {
+      setFormData(prev => ({
+        ...prev,
+        username: user.user_metadata.username || prev.username,
+        fullName: user.user_metadata.full_name || user.user_metadata.first_name || prev.fullName,
+        whatsapp: user.user_metadata.whatsapp || prev.whatsapp
+      }));
+      setIsUsernameLocked(user.user_metadata.is_username_set === true);
+    }
+  }, [user]);
 
   // Fetch data on mount
   useEffect(() => {
@@ -63,15 +75,15 @@ export default function ProfilePage() {
 
         if (data) {
           userUsername = data.username || userUsername;
-          setFormData({
-            username: data.username || user?.user_metadata?.username || '',
-            firstName: data.first_name || user?.user_metadata?.first_name || '',
-            lastName: data.last_name || user?.user_metadata?.last_name || '',
-            whatsapp: data.whatsapp || '',
-            province: data.province || '-',
-            address: data.address || '',
-            birthDate: data.birth_date || ''
-          });
+          setFormData(prev => ({
+            ...prev,
+            username: data.username || user?.user_metadata?.username || prev.username,
+            fullName: data.full_name || data.first_name || user?.user_metadata?.full_name || user?.user_metadata?.first_name || prev.fullName,
+            whatsapp: data.whatsapp || user?.user_metadata?.whatsapp || prev.whatsapp,
+            province: data.province || prev.province,
+            address: data.address || prev.address,
+            birthDate: data.birth_date || prev.birthDate
+          }));
           // Jika username sudah ada di database dan metadata mengatakan sudah di-set
           setIsUsernameLocked(user?.user_metadata?.is_username_set === true);
         } else {
@@ -123,8 +135,8 @@ export default function ProfilePage() {
     if (!user) return;
     
     // Validasi Field NOT NULL
-    if (!formData.firstName.trim() || !formData.whatsapp.trim() || !formData.address.trim()) {
-       setSaveStatus({ type: 'error', message: 'Tolong lengkapi: Nama Depan, WhatsApp, dan Alamat.' });
+    if (!formData.fullName.trim() || !formData.whatsapp.trim() || !formData.address.trim()) {
+       setSaveStatus({ type: 'error', message: 'Tolong lengkapi: Nama Lengkap, WhatsApp, dan Alamat.' });
        return;
     }
 
@@ -138,8 +150,7 @@ export default function ProfilePage() {
         .upsert({
           user_id: user.id,
           username: formData.username.trim(),
-          first_name: formData.firstName.trim(),
-          last_name: formData.lastName.trim() || null,
+          full_name: formData.fullName.trim(),
           whatsapp: formData.whatsapp.trim(),
           province: formData.province || '-',
           address: formData.address.trim(),
@@ -161,8 +172,8 @@ export default function ProfilePage() {
       const { error: authError } = await supabase.auth.updateUser({
         data: {
           username: formData.username.trim(),
-          first_name: formData.firstName.trim(),
-          last_name: formData.lastName.trim(),
+          full_name: formData.fullName.trim(),
+          whatsapp: formData.whatsapp.trim(),
           is_username_set: true // Tandai bahwa username sudah di-set oleh user
         }
       });
@@ -180,9 +191,7 @@ export default function ProfilePage() {
     }
   };
 
-  const displayName = user?.user_metadata?.first_name 
-    ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`
-    : user?.email?.split('@')[0] || 'Member';
+  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Member';
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -320,26 +329,14 @@ export default function ProfilePage() {
                      </div>
 
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Depan</label>
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Lengkap</label>
                         <div className="relative group">
                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
                            <input 
                               type="text" 
-                              value={formData.firstName}
-                              onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
-                           />
-                        </div>
-                     </div>
-
-                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Belakang</label>
-                        <div className="relative group">
-                           <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
-                           <input 
-                              type="text" 
-                              value={formData.lastName}
-                              onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                              value={formData.fullName}
+                              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                              placeholder="Masukkan nama lengkap Anda"
                               className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
                            />
                         </div>
