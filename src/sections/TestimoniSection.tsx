@@ -5,20 +5,20 @@ import Section from '../components/Section';
 
 const testimonials = [
   {
-    name: 'Rian Hidayat',
+    name: 'Khumaira',
     role: 'Full-time Affiliate',
-    image: '/rian hidayat.jpg',
+    image: '/khumaira.jpeg',
     rating: 5,
-    text: 'Sistem affiliate Lampung Cerdas sangat transparan. Saya bisa memantau setiap klik dan closing secara real-time. Komisi selalu cair tepat waktu, sangat membantu ekonomi keluarga.',
-    income: 'Rp 4.5jt/bulan'
+    text: 'Alhamdulillah sudah banyak Resolusi saya tercapai Mulai dari medapatkan 10 juta pertama saya, bayar kuliah sendiri, dan membeli kendaraan dengan uang saya sendiri. Itu semua saya sadari Karena Saya Join Program Mentoringnya Lampung Cerdas. Sudah tidak di ragukan lagi,Join saja dan rasakan Manfaatnya.',
+    income: 'Rp 4.5jt/bulan',
   },
   {
-    name: 'Sarah Amalia',
-    role: 'Mahasiswi UI',
-    image: '/Sarah Amalia.jpg',
+    name: 'Ditra Irfan',
+    role: 'Mahasiswa',
+    image: '/Ditra Irfan.jpeg',
     rating: 5,
-    text: 'Awalnya cuma coba-coba buat uang jajan. Ternyata pasarnya luas banget karena produk edukasinya memang berkualitas. Sekarang hobi share link malah jadi sumber penghasilan utama.',
-    income: 'Rp 2.2jt/bulan'
+    text: 'Dari berbagai program yang aku ikuti, penghasilan total yang aku dapet lebih dari 10 juta rupiah. Tapi buat aku, yang paling berharga adalah perubahan diri. Program kayak SNBT Plus, Public Speaking School, Life Mentoring Batch, Resolusi Mimpi, dan berbagai ebook serta buku seperti Cara Gila Mengubah Diri, Jangan Menyerah Harus Berubah, Kuliah dengan Modal Nol Rupiah',
+    income: 'Rp 2.2jt/bulan',
   },
   {
     name: 'Ade Eka ',
@@ -26,8 +26,16 @@ const testimonials = [
     image: '/mba ade.png',
     rating: 5,
     text: 'Saya sudah ikut banyak program affiliate, tapi support di sini luar biasa. Disediakan konten harian yang tinggal copas. Sangat cocok buat yang sibuk tapi ingin tetap produktif.',
-    income: 'Rp 7.8jt/bulan'
-  }
+    income: 'Rp 7.8jt/bulan',
+  },
+  {
+    name: 'Nita ',
+    role: 'Influenser',
+    image: '/nita.png',
+    rating: 5,
+    text: 'Saya sudah ikut banyak program affiliate, tapi support di sini luar biasa. Disediakan konten harian yang tinggal copas. Sangat cocok buat yang sibuk tapi ingin tetap produktif.',
+    income: 'Rp 7.8jt/bulan',
+  },
 ];
 
 export default function TestimoniSection() {

@@ -1,4 +1,4 @@
-import { GraduationCap, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Linkedin, Heart } from 'lucide-react';
+import { GraduationCap, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Linkedin, Heart, Music2 } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -24,10 +24,18 @@ export default function Footer() {
             </p>
 
             <div className="flex gap-4">
-              {[Facebook, Instagram, Twitter, Linkedin].map((Icon, i) => (
+              {[
+                { Icon: Facebook, url: 'https://facebook.com/lampungcerdas' },
+                { Icon: Instagram, url: 'https://instagram.com/lampungcerdas' },
+                { Icon: Twitter, url: 'https://twitter.com/lampungcerdas' },
+                { Icon: Linkedin, url: 'https://linkedin.com/company/lampung-cerdas' },
+                { Icon: Music2, url: 'https://tiktok.com/@lampungcerdas' }
+              ].map(({ Icon, url }, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center hover:bg-primary-600 hover:text-white hover:-translate-y-1 transition-all duration-300"
                 >
                   <Icon className="w-5 h-5" />

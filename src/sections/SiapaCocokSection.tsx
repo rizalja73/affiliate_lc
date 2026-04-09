@@ -1,11 +1,12 @@
-import { GraduationCap, Users, BookOpen, Laptop, Megaphone, Briefcase, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Users, BookOpen, Home, Megaphone, Briefcase, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Section from '../components/Section';
 
 const profiles = [
   {
     icon: GraduationCap,
-    title: 'Mahasiswa',
+    title: 'Mahasiswa & Pelajar',
     description: 'Cari tambahan uang jajan sambil kuliah dengan promosi fleksibel sesuai jadwal Anda.',
     gradient: 'from-primary-500 to-primary-600'
   },
@@ -22,9 +23,9 @@ const profiles = [
     gradient: 'from-primary-500 to-primary-600'
   },
   {
-    icon: Laptop,
-    title: 'Freelancer',
-    description: 'Tambah stream income baru dengan memanfaatkan skill digital marketing Anda.',
+    icon: Home,
+    title: 'IRT',
+    description: 'Dapatkan penghasilan tambahan dari rumah sambil tetap fokus mengurus keluarga.',
     gradient: 'from-primary-500 to-primary-600'
   },
   {
@@ -42,6 +43,8 @@ const profiles = [
 ];
 
 export default function SiapaCocokSection() {
+  const navigate = useNavigate();
+
   return (
     <Section background="gradient" className="relative overflow-hidden">
       <div className="absolute top-0 right-1/4 w-64 h-64 bg-primary-100 rounded-full blur-3xl opacity-30 -z-10"></div>
@@ -65,10 +68,13 @@ export default function SiapaCocokSection() {
             <h3 className="text-2xl font-black text-gray-900 mb-4">{profile.title}</h3>
             <p className="text-gray-600 leading-relaxed font-normal mb-8">{profile.description}</p>
 
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-primary-600 font-bold text-sm group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 cursor-pointer">
+            <button 
+              onClick={() => navigate('/register')}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-primary-600 font-bold text-sm group-hover:bg-primary-600 group-hover:text-white transition-all duration-300 cursor-pointer border-none"
+            >
               <span>Mulai Sekarang</span>
               <CheckCircle2 className="w-4 h-4" />
-            </div>
+            </button>
             
             {/* Subtle number background */}
             <span className="absolute -bottom-4 -right-2 text-8xl font-black text-gray-100/30 group-hover:text-primary-50/50 transition-colors pointer-events-none">
@@ -88,7 +94,10 @@ export default function SiapaCocokSection() {
           <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-2xl mx-auto font-medium">
             Kami menyediakan Video Tutorial, Copywriting siap pakai, hingga Training eksklusif di grup private untuk memastikan Anda bisa langsung action dan closing!
           </p>
-          <button className="px-10 py-5 bg-primary-600 text-white font-black text-xl rounded-2xl shadow-xl shadow-primary-200 hover:bg-primary-700 hover:scale-105 transition-all active:scale-95">
+          <button 
+            onClick={() => navigate('/register')}
+            className="px-10 py-5 bg-primary-600 text-white font-black text-xl rounded-2xl shadow-xl shadow-primary-200 hover:bg-primary-700 hover:scale-105 transition-all active:scale-95"
+          >
             GABUNG SEKARANG JUGA
           </button>
         </div>

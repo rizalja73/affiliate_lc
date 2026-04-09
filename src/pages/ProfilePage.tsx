@@ -10,7 +10,9 @@ import {
   ShieldCheck,
   AtSign,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Pencil,
+  X
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +27,7 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
     username: user?.user_metadata?.username || user?.email?.split('@')[0] || '',
@@ -181,6 +184,7 @@ export default function ProfilePage() {
       if (authError) throw authError;
 
       setIsUsernameLocked(true); // Kunci input username setelah save berhasil
+      setIsEditing(false); // Keluar dari mode edit setelah simpan berhasil
       setSaveStatus({ type: 'success', message: 'Profil berhasil diperbarui!' });
     } catch (err: any) {
       console.error('Update error:', err);
@@ -337,7 +341,12 @@ export default function ProfilePage() {
                               value={formData.fullName}
                               onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                               placeholder="Masukkan nama lengkap Anda"
-                              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
+                              disabled={!isEditing}
+                              className={`w-full pl-12 pr-4 py-4 border rounded-2xl text-sm font-bold outline-none transition-all ${
+                                !isEditing 
+                                ? "bg-gray-100 border-gray-100 text-gray-500 cursor-not-allowed" 
+                                : "bg-gray-50 border-gray-100 text-gray-700 focus:bg-white focus:ring-2 focus:ring-primary-100"
+                              }`}
                            />
                         </div>
                      </div>
@@ -350,7 +359,12 @@ export default function ProfilePage() {
                               type="date" 
                               value={formData.birthDate}
                               onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-                              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
+                              disabled={!isEditing}
+                              className={`w-full pl-12 pr-4 py-4 border rounded-2xl text-sm font-bold outline-none transition-all ${
+                                !isEditing 
+                                ? "bg-gray-100 border-gray-100 text-gray-500 cursor-not-allowed" 
+                                : "bg-gray-50 border-gray-100 text-gray-700 focus:bg-white focus:ring-2 focus:ring-primary-100"
+                              }`}
                            />
                         </div>
                      </div>
@@ -389,7 +403,12 @@ export default function ProfilePage() {
                               placeholder="628xxxxxxxx"
                               value={formData.whatsapp}
                               onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
-                              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all"
+                              disabled={!isEditing}
+                              className={`w-full pl-12 pr-4 py-4 border rounded-2xl text-sm font-bold outline-none transition-all ${
+                                !isEditing 
+                                ? "bg-gray-100 border-gray-100 text-gray-500 cursor-not-allowed" 
+                                : "bg-gray-50 border-gray-100 text-gray-700 focus:bg-white focus:ring-2 focus:ring-primary-100"
+                              }`}
                            />
                         </div>
                      </div>
@@ -402,7 +421,12 @@ export default function ProfilePage() {
                               rows={2}
                               value={formData.address}
                               onChange={(e) => setFormData({...formData, address: e.target.value})}
-                              className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 outline-none focus:bg-white focus:ring-2 focus:ring-primary-100 transition-all resize-none"
+                              disabled={!isEditing}
+                              className={`w-full pl-12 pr-4 py-4 border rounded-2xl text-sm font-bold outline-none transition-all resize-none ${
+                                !isEditing 
+                                ? "bg-gray-100 border-gray-100 text-gray-500 cursor-not-allowed" 
+                                : "bg-gray-50 border-gray-100 text-gray-700 focus:bg-white focus:ring-2 focus:ring-primary-100"
+                              }`}
                               placeholder="Jl. Bumi Manti III..."
                            />
                         </div>
@@ -411,32 +435,52 @@ export default function ProfilePage() {
                </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex flex-wrap items-center justify-between gap-6 px-4">
-               <button 
-                  onClick={() => navigate(-1)}
-                  className="px-8 py-4 text-gray-500 font-bold hover:text-primary-600 transition-colors"
-               >
-                  Batalkan Perubahan
-               </button>
-               <Button 
-                onClick={handleSave}
-                size="xl" 
-                rounded="full" 
-                className="min-w-[200px] shadow-2xl shadow-primary-200"
-               >
-                  {isSaving ? (
-                     <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Menyimpan...
-                     </div>
-                  ) : (
-                     <div className="flex items-center gap-2">
-                        <Save className="w-5 h-5" />
-                        Simpan Profil
-                     </div>
-                  )}
-               </Button>
+            <div className="flex flex-wrap items-center justify-end gap-4 px-4 bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+               {isEditing ? (
+                 <>
+                   <button 
+                      onClick={() => {
+                        setIsEditing(false);
+                        window.location.reload(); // Reset changes
+                      }}
+                      className="flex items-center gap-2 px-8 py-4 text-gray-500 font-bold hover:text-red-600 transition-colors"
+                   >
+                      <X className="w-5 h-5" />
+                      Batalkan
+                   </button>
+                   <Button 
+                    onClick={handleSave}
+                    size="xl" 
+                    rounded="full" 
+                    className="min-w-[180px] shadow-2xl shadow-primary-200"
+                   >
+                      {isSaving ? (
+                         <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            Menyimpan...
+                         </div>
+                      ) : (
+                         <div className="flex items-center gap-2">
+                            <Save className="w-5 h-5" />
+                            Simpan Profil
+                         </div>
+                      )}
+                   </Button>
+                 </>
+               ) : (
+                 <Button 
+                  onClick={() => setIsEditing(true)}
+                  size="xl" 
+                  rounded="full" 
+                  variant="primary"
+                  className="min-w-[180px] shadow-2xl shadow-primary-200"
+                 >
+                    <div className="flex items-center gap-2">
+                       <Pencil className="w-5 h-5" />
+                       Edit Profil
+                    </div>
+                 </Button>
+               )}
             </div>
           </div>
         </main>

@@ -5,7 +5,6 @@ import {
   Plus,
   ShoppingBag, 
   Wallet, 
-  BarChart3, 
   Image as ImageIcon,
   Home,
   GraduationCap
@@ -24,13 +23,6 @@ export default function FloatingActionMenu() {
       color: 'bg-gradient-to-tr from-orange-600 to-orange-400',
       shadow: 'shadow-orange-500/40',
       path: '/marketing'
-    },
-    {
-      icon: <BarChart3 className="w-5 h-5" />,
-      label: 'Data Penjualan',
-      color: 'bg-gradient-to-tr from-purple-600 to-purple-400',
-      shadow: 'shadow-purple-500/40',
-      path: '/sales'
     },
     {
       icon: <Wallet className="w-5 h-5" />,
@@ -55,7 +47,7 @@ export default function FloatingActionMenu() {
     },
     {
       icon: <ShoppingBag className="w-5 h-5" />,
-      label: 'Produk LC',
+      label: 'Cek Produk',
       color: 'bg-gradient-to-tr from-blue-600 to-blue-400',
       shadow: 'shadow-blue-500/40',
       path: '/products'

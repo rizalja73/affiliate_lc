@@ -49,11 +49,11 @@ export default function KeuntunganSection() {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         {benefits.map((benefit, index) => (
-          <Card key={index} className="group p-8 border-none bg-white shadow-xl shadow-gray-100/50 hover:shadow-2xl hover:shadow-primary-100/40 transition-all duration-500 rounded-3xl relative overflow-hidden">
+          <Card key={index} className="group p-8 border-none bg-white shadow-xl shadow-gray-100/50 hover:shadow-2xl hover:shadow-primary-100/40 transition-all duration-500 rounded-3xl relative overflow-hidden flex flex-col items-center text-center md:items-start md:text-left">
             <div className={`w-16 h-16 mb-6 bg-gradient-to-br ${benefit.color} rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg`}>
               <benefit.icon className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-4">{benefit.title}</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
             <p className="text-gray-600 leading-relaxed text-sm md:text-base">{benefit.description}</p>
 
             {/* Subtle Gradient Overlay */}
