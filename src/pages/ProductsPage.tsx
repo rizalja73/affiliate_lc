@@ -157,8 +157,8 @@ export default function ProductsPage() {
           </div>
 
           {loading ? (
-             <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-                {[1,2,3,4].map(i => <div key={i} className="bg-white rounded-[2.5rem] p-4 h-96 animate-pulse border border-gray-100 shadow-sm" />)}
+             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1,2,3,4,5,6].map(i => <div key={i} className="bg-white rounded-[2.5rem] p-4 h-[450px] animate-pulse border border-gray-100 shadow-sm" />)}
              </div>
           ) : error ? (
              <div className="bg-red-50 p-12 rounded-[3rem] border border-red-100 text-center space-y-4">
@@ -166,47 +166,48 @@ export default function ProductsPage() {
                 <Button variant="outline" onClick={() => window.location.reload()}>Coba Lagi</Button>
              </div>
           ) : viewMode === 'grid' ? (
-             <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProducts.map((product) => (
-                  <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)} className="group cursor-pointer bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col">
-                    <div className="relative h-64 overflow-hidden">
+                  <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)} className="group cursor-pointer bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-primary-100/30 hover:-translate-y-2 transition-all duration-500 flex flex-col">
+                    <div className="relative h-56 overflow-hidden">
                       <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
-                    <div className="p-8 lg:p-10 space-y-6 flex-1 flex flex-col">
+                    <div className="p-6 lg:p-8 space-y-6 flex-1 flex flex-col">
                       <div className="space-y-2">
-                        <h3 className="text-2xl font-black text-gray-900 leading-tight group-hover:text-primary-600 transition-colors line-clamp-2">{product.name}</h3>
-                        <p className="text-emerald-600 font-bold text-xs uppercase tracking-widest">{product.category} • {product.salesCount}</p>
+                        <h3 className="text-xl font-black text-gray-900 leading-tight group-hover:text-primary-600 transition-colors line-clamp-4 min-h-[6rem]">{product.name}</h3>
+                        <p className="text-emerald-600 font-bold text-[10px] uppercase tracking-widest">{product.category} • {product.salesCount}</p>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-5 bg-gray-50 rounded-[1.5rem] border border-gray-100">
-                          <div className="text-[9px] font-bold text-gray-400 uppercase mb-1">Harga Jual</div>
-                          <div className="text-[17px] font-black text-gray-900">{formatCurrency(product.price)}</div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase">Harga</span>
+                          <span className="text-sm font-black text-gray-900">{formatCurrency(product.price)}</span>
                         </div>
-                        <div className="p-5 bg-primary-50 rounded-[1.5rem] border border-primary-100">
-                          <div className="text-[9px] font-bold text-primary-400 uppercase mb-1">Komisi (12%)</div>
-                          <div className="text-[17px] font-black text-primary-700">{formatCurrency(product.commission)}</div>
+                        <div className="flex items-center justify-between p-4 bg-primary-50 rounded-2xl border border-primary-100">
+                          <span className="text-[10px] font-bold text-primary-400 uppercase">Komisi</span>
+                          <span className="text-sm font-black text-primary-700">{formatCurrency(product.commission)}</span>
                         </div>
                       </div>
-
+                      
                       <div className="mt-auto grid grid-cols-2 gap-3">
                         <Button 
                           variant="outline" 
-                          className={`py-4 px-1 text-xs font-black flex items-center justify-center gap-2 transition-all duration-300 ${copyingId === product.id ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : ''}`}
+                          className={`py-3.5 px-1 text-[10px] font-black flex items-center justify-center gap-2 transition-all duration-300 ${copyingId === product.id ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : ''}`}
                           onClick={(e) => handleCopy(e, product)}
                         >
                           {copyingId === product.id ? (
-                            <><Check className="w-4 h-4" /> Tersalin</>
+                            <><Check className="w-3.5 h-3.5" /> Tersalin</>
                           ) : (
-                            <><Copy className="w-4 h-4" /> Salin Link</>
+                            <><Copy className="w-3.5 h-3.5" /> Salin</>
                           )}
                         </Button>
                         <Button 
-                          className="py-4 px-1 text-xs font-black shadow-lg shadow-primary-200"
+                          className="py-3.5 px-1 text-[10px] font-black shadow-lg shadow-primary-200"
                           onClick={(e) => { e.stopPropagation(); window.open(generateAffiliateLink(product), '_blank'); }}
                         >
                           Buka Link
-                          <ExternalLink className="w-4 h-4 ml-2" />
+                          <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
                         </Button>
                       </div>
                     </div>
@@ -225,7 +226,7 @@ export default function ProductsPage() {
                            <td className="px-10 py-8">
                               <div className="flex items-center gap-6">
                                  <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm"><img src={product.image} className="w-full h-full object-cover" /></div>
-                                 <h4 className="font-black text-gray-900 group-hover:text-primary-600 transition-colors">{product.name}</h4>
+                                 <h4 className="text-lg font-black text-gray-900 group-hover:text-primary-600 transition-colors leading-snug line-clamp-4 min-h-[4.5rem]">{product.name}</h4>
                               </div>
                            </td>
                            <td className="px-6 py-8 text-center space-y-1">

@@ -93,7 +93,7 @@ export default function MarketingMaterialsPage() {
 
             // Custom overrides for specific materials
             if (titleStr.includes('public speaking') || titleStr.includes('promosi terbaru') || titleStr.includes('video iklan')) {
-              coverImage = '/ps.jpg';
+              coverImage = '/bahan marketing gemini.png';
             }
 
             return {
@@ -228,8 +228,8 @@ export default function MarketingMaterialsPage() {
                     key={cat.id}
                     onClick={() => setActiveFilter(cat.id)}
                     className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeFilter === cat.id
-                        ? 'bg-primary-50 text-primary-600 shadow-sm border border-primary-100 scale-105'
-                        : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                      ? 'bg-primary-50 text-primary-600 shadow-sm border border-primary-100 scale-105'
+                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
                       }`}
                   >
                     {cat.icon}
@@ -293,7 +293,7 @@ export default function MarketingMaterialsPage() {
                             {item.tag}
                           </span>
                         </div>
-                        <h4 className="text-lg font-black text-gray-900 group-hover:text-primary-600 transition-colors leading-snug line-clamp-2">
+                        <h4 className="text-lg font-black text-gray-900 group-hover:text-primary-600 transition-colors leading-snug line-clamp-4 min-h-[5rem]">
                           {item.title}
                         </h4>
                         <p className="text-sm text-gray-500 font-medium leading-relaxed line-clamp-2">

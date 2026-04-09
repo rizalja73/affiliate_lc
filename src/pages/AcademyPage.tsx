@@ -237,7 +237,7 @@ export default function AcademyPage() {
                             Live Center
                          </div>
                       </div>
-                      <h3 className="text-xl font-black text-gray-900 leading-tight group-hover:text-primary-600 transition-colors">{item.title}</h3>
+                      <h3 className="text-xl font-black text-gray-900 leading-tight group-hover:text-primary-600 transition-colors line-clamp-4 min-h-[5rem]">{item.title}</h3>
                       <p className="text-sm text-gray-500 font-medium leading-relaxed line-clamp-2">
                         {item.description}
                       </p>

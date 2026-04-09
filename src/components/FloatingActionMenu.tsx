@@ -7,7 +7,8 @@ import {
   Wallet, 
   Image as ImageIcon,
   Home,
-  GraduationCap
+  GraduationCap,
+  BarChart3
 } from 'lucide-react';
 
 export default function FloatingActionMenu() {
@@ -29,6 +30,13 @@ export default function FloatingActionMenu() {
       label: 'Cek Pendapatan',
       color: 'bg-gradient-to-tr from-emerald-600 to-emerald-400',
       shadow: 'shadow-emerald-500/40',
+      path: '/earnings'
+    },
+    {
+      icon: <BarChart3 className="w-5 h-5" />,
+      label: 'Data Penjualan',
+      color: 'bg-gradient-to-tr from-purple-600 to-purple-400',
+      shadow: 'shadow-purple-500/40',
       path: '/earnings'
     },
     {

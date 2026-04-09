@@ -37,6 +37,9 @@ export default function EarningsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Tabs State
+  const [activeTab, setActiveTab] = useState<'pendapatan' | 'penjualan'>('pendapatan');
+
   // Page State
   const [activeFilter, setActiveFilter] = useState<'semua' | 'pending' | 'sukses' | 'failed'>('semua');
   const [isCalling, setIsCalling] = useState(false);
@@ -243,12 +246,20 @@ export default function EarningsPage() {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex flex-col">
-                <h1 className="text-xl font-black text-gray-900 leading-none">Keuangan & Pendapatan</h1>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-50 text-primary-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-primary-100">
-                    <Sparkles className="w-3 h-3" />
-                    Data Terintegrasi
-                  </div>
+                <h1 className="text-xl font-black text-gray-900 leading-none">Keuangan & Penjualan</h1>
+                <div className="flex items-center gap-4 mt-2">
+                  <button
+                    onClick={() => setActiveTab('pendapatan')}
+                    className={`text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'pendapatan' ? 'text-primary-600 border-b-2 border-primary-600 pb-1' : 'text-gray-400 hover:text-gray-600'}`}
+                  >
+                    Cek Pendapatan
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('penjualan')}
+                    className={`text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'penjualan' ? 'text-primary-600 border-b-2 border-primary-600 pb-1' : 'text-gray-400 hover:text-gray-600'}`}
+                  >
+                    Data Penjualan
+                  </button>
                 </div>
               </div>
             </div>
@@ -266,8 +277,9 @@ export default function EarningsPage() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto p-6 lg:p-10 space-y-16 w-full animate-fade-in">
-          <div className="space-y-10">
+        <main className="max-w-7xl mx-auto p-6 lg:p-10 space-y-10 w-full animate-fade-in" key={activeTab}>
+          {activeTab === 'pendapatan' ? (
+            <>
               {/* Balance Section */}
               <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 to-emerald-800 rounded-[3rem] p-10 lg:p-14 text-white shadow-2xl shadow-emerald-200">
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
@@ -484,36 +496,26 @@ export default function EarningsPage() {
                   <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2"></div>
                 </div>
               </footer>
-              {/* Sales Data Section (Merged) */}
-              <div className="pt-10 border-t-2 border-dashed border-gray-100 space-y-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary-200">
-                      <ShoppingBag className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-black text-gray-900 tracking-tight">Rincian Penjualan</h3>
-                      <p className="text-sm font-medium text-gray-400">Data performa penjualan produk Anda</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex p-1.5 bg-gray-100 rounded-2xl w-fit border border-gray-200">
-                    <button
-                      onClick={() => setActiveSalesView('produk')}
-                      className={`px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeSalesView === 'produk' ? 'bg-white text-primary-600 shadow-md' : 'text-gray-500 hover:bg-gray-200'}`}
-                    >
-                      <ShoppingBag className="w-4 h-4" />
-                      Produk
-                    </button>
-                    <button
-                      onClick={() => setActiveSalesView('audiens')}
-                      className={`px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeSalesView === 'audiens' ? 'bg-white text-primary-600 shadow-md' : 'text-gray-500 hover:bg-gray-200'}`}
-                    >
-                      <Users className="w-4 h-4" />
-                      Audiens
-                    </button>
-                  </div>
-                </div>
+            </>
+          ) : (
+            <div className="space-y-10">
+              {/* Sales View Selector inside Penjualan tab */}
+              <div className="flex p-1.5 bg-gray-100 rounded-2xl w-fit border border-gray-200">
+                <button
+                  onClick={() => setActiveSalesView('produk')}
+                  className={`px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeSalesView === 'produk' ? 'bg-white text-primary-600 shadow-md' : 'text-gray-500 hover:bg-gray-200'}`}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Produk
+                </button>
+                <button
+                  onClick={() => setActiveSalesView('audiens')}
+                  className={`px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeSalesView === 'audiens' ? 'bg-white text-primary-600 shadow-md' : 'text-gray-500 hover:bg-gray-200'}`}
+                >
+                  <Users className="w-4 h-4" />
+                  Audiens
+                </button>
+              </div>
 
               {activeSalesView === 'produk' ? (
                 <div className="space-y-10">
@@ -643,7 +645,7 @@ export default function EarningsPage() {
                 </div>
               )}
             </div>
-          </div>
+          )}
         </main>
 
         <FloatingActionMenu />
