@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   ShoppingBag, 
@@ -9,25 +10,51 @@ import {
   GraduationCap,
   User,
   Lock,
-  LogOut
+  LogOut,
+  Bell,
+  Settings,
+  HelpCircle,
+  MessageCircle,
+  ChevronRight,
+  Sparkles,
+  Search
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function FloatingActionMenu() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('affiliate_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        setProfile(data || user.user_metadata);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const actions = [
-    { icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard Utama', desc: 'Ringkasan statistik & performa', color: 'bg-primary-600', shadow: 'shadow-primary-100', path: '/dashboard', category: 'Main' },
-    { icon: <ShoppingBag className="w-5 h-5" />, label: 'Katalog Produk', desc: 'Cek produk & ambil link affiliate', color: 'bg-emerald-600', shadow: 'shadow-emerald-100', path: '/products', category: 'Main' },
-    { icon: <FileText className="w-5 h-5" />, label: 'Asset Promosi', desc: 'Video iklan, story & copywriting', color: 'bg-blue-600', shadow: 'shadow-blue-100', path: '/marketing', category: 'Main' },
-    { icon: <Wallet className="w-5 h-5" />, label: 'Keuangan & Sales', desc: 'Pantau saldo & riwayat penjualan', color: 'bg-orange-600', shadow: 'shadow-orange-100', path: '/earnings', category: 'Main' },
-    { icon: <GraduationCap className="w-5 h-5" />, label: 'Academy Affiliate', desc: 'Belajar strategi penjualan cerdas', color: 'bg-purple-600', shadow: 'shadow-purple-100', path: '/academy', category: 'Main' },
-    { icon: <User className="w-5 h-5" />, label: 'Profil Saya', desc: 'Pengaturan identitas & akun', color: 'bg-cyan-600', shadow: 'shadow-cyan-100', path: '/profile', category: 'Account' },
-    { icon: <Lock className="w-5 h-5" />, label: 'Ganti Password', desc: 'Keamanan & akses masuk', color: 'bg-slate-600', shadow: 'shadow-slate-100', path: '/change-password', category: 'Account' },
-    { icon: <LogOut className="w-5 h-5" />, label: 'Keluar Akun', desc: 'Sesi berakhir dengen aman', color: 'bg-red-600', shadow: 'shadow-red-100', action: 'logout', category: 'Account' },
+  const mainActions = [
+    { icon: <LayoutDashboard className="w-6 h-6" />, label: 'Dashboard Utama', desc: 'Ringkasan statistik & performa', color: 'bg-indigo-600', path: '/dashboard' },
+    { icon: <ShoppingBag className="w-6 h-6" />, label: 'Cek Produk', desc: 'Katalog program & link affiliate', color: 'bg-emerald-600', path: '/products' },
+    { icon: <FileText className="w-6 h-6" />, label: 'Bahan Marketing', desc: 'Video, story & copywriting promosi', color: 'bg-blue-600', path: '/marketing' },
+    { icon: <Wallet className="w-6 h-6" />, label: 'Cek Pendapatan', desc: 'Pantau saldo & riwayat komisi', color: 'bg-orange-600', path: '/earnings' },
+    { icon: <GraduationCap className="w-6 h-6" />, label: 'Academy Affiliate', desc: 'Belajar strategi penjualan cerdas', color: 'bg-purple-600', path: '/academy' },
+  ];
+
+  const accountActions = [
+    { icon: <User className="w-5 h-5" />, label: 'Profil Saya', path: '/profile' },
+    { icon: <Lock className="w-5 h-5" />, label: 'Keamanan Akun', path: '/change-password' },
+    { icon: <Settings className="w-5 h-5" />, label: 'Pengaturan', path: '/profile' },
   ];
 
   const handleAction = async (item: any) => {
@@ -40,143 +67,145 @@ export default function FloatingActionMenu() {
     setIsOpen(false);
   };
 
-  const mainActions = actions.filter(a => a.category === 'Main');
-  const accountActions = actions.filter(a => a.category === 'Account');
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+    setIsOpen(false);
+  };
 
-  return (
-    <div className="xl:hidden">
-      {/* Menu Overlay (Fixed) */}
-      <div className={`fixed inset-0 z-[110] transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
-        {/* Backdrop - Keep slightly dimmed but remove blur if requested "not transparent" (User usually means UI components) */}
-        {/* I will keep the dimming for focus but remove the heavy blur from the layout if that's what's bothering them */}
-        <div 
-          className={`fixed inset-0 bg-gray-900/40 transition-all duration-700 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
-          onClick={() => setIsOpen(false)}
-        />
+  const menuOverlay = (
+    <div className={`fixed inset-0 z-[9999] transition-all duration-500 ${isOpen ? 'visible' : 'invisible'}`}>
+      {/* Solid Dark Backdrop */}
+      <div 
+        className={`fixed inset-0 bg-gray-950/90 transition-all duration-500 ease-in-out ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+        onClick={() => setIsOpen(false)}
+      />
 
-        {/* Slide-in Menu Panel (Left Side) */}
-        <div 
-          className={`fixed top-0 left-0 h-full w-[85%] max-w-[340px] bg-white shadow-[10px_0_30px_rgba(0,0,0,0.1)] transition-all duration-500 ease-out transform flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
-        >
-          {/* Decorative elements - Subtle and not distracting */}
-          <div className="absolute top-0 right-0 w-40 h-40 bg-gray-50 rounded-full -translate-y-1/2 translate-x-1/2 blur-[80px]"></div>
-
-          {/* Menu Header - Solid Background */}
-          <div className="p-8 border-b border-gray-100 relative bg-white">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-gray-100 p-2">
-                  <img src="/Logo LC.png" alt="Logo" className="w-full h-full object-contain" />
-                </div>
-                <div>
-                  <div className="text-xl font-black text-gray-900 leading-none tracking-tight">Pusat Navigasi</div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] font-black text-primary-600 mt-2">Affiliate Elite v2.0</div>
-                </div>
-              </div>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-900 hover:bg-gray-200 transition-colors border border-gray-200"
-              >
-                <X className="w-5 h-5" />
-              </button>
+      {/* Side Menu Panel */}
+      <div 
+        className={`fixed top-0 left-0 h-[100dvh] w-[88%] max-w-[400px] bg-white transition-all duration-500 ease-out transform flex flex-col shadow-[20px_0_50px_rgba(0,0,0,0.3)] ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        {/* Header Section: User Info & Brand */}
+        <div className="p-8 pb-6 bg-primary-600 relative overflow-hidden shrink-0">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary-400/20 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+          
+          <div className="relative z-10 flex items-center justify-between mb-8">
+            <div className="bg-white p-2 rounded-2xl shadow-xl">
+               <img src="/Logo LC.png" alt="LC Logo" className="w-10 h-10 object-contain" />
             </div>
+            <button 
+              onClick={() => setIsOpen(false)}
+              className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/20 text-white hover:bg-white/30 transition-all border border-white/30 active:scale-95"
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
 
-          {/* Menu Items */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-10 custom-scrollbar relative bg-white">
-            {/* Main Section */}
-            <div className="space-y-4">
-              <div className="text-[10px] font-black text-gray-900 uppercase tracking-[0.3em] px-4 mb-2 flex items-center gap-3">
-                <span className="w-8 h-px bg-primary-600"></span>
-                MENU UTAMA
-              </div>
-              {mainActions.map((action, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleAction(action)}
-                  className="w-full flex items-center gap-5 p-5 rounded-[2rem] bg-gray-50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/50 transition-all group relative overflow-hidden active:scale-95 border border-gray-100"
-                  style={{ 
-                    transitionDelay: `${isOpen ? index * 50 : 0}ms`,
-                    opacity: isOpen ? 1 : 0,
-                    transform: isOpen ? 'translateX(0)' : 'translateX(-40px)'
-                  }}
-                >
-                  <div className={`w-14 h-14 ${action.color} rounded-2xl flex items-center justify-center text-white shadow-lg ${action.shadow} group-hover:scale-105 transition-all duration-500`}>
-                    {action.icon}
-                  </div>
-                  <div className="text-left flex-1">
-                    <div className="text-sm font-black text-gray-900 group-hover:text-primary-600 transition-colors tracking-tight">{action.label}</div>
-                    <div className="text-[10px] text-gray-600 font-bold mt-1 line-clamp-1 group-hover:text-gray-900 transition-colors">{action.desc}</div>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center text-primary-600">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </button>
-              ))}
-            </div>
+          <div className="relative z-10 flex items-center gap-5">
+             <div className="w-16 h-16 rounded-[1.5rem] bg-white p-1 shadow-2xl relative">
+                <img 
+                  src={profile?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"} 
+                  alt="User" 
+                  className="w-full h-full rounded-[1.25rem] object-cover" 
+                />
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-white rounded-full"></div>
+             </div>
+             <div className="flex-1">
+                <h3 className="text-xl font-black text-white leading-none mb-1">
+                  {profile?.full_name || profile?.username || "Elite Member"}
+                </h3>
+                <div className="flex items-center gap-2">
+                   <span className="text-[10px] font-black text-primary-100 uppercase tracking-widest px-2 py-0.5 bg-white/20 rounded-full">Affiliate Pro</span>
+                   <Sparkles className="w-3 h-3 text-amber-300 fill-amber-300" />
+                </div>
+             </div>
+          </div>
+        </div>
 
-            {/* Account Section */}
-            <div className="space-y-4">
-              <div className="text-[10px] font-black text-gray-900 uppercase tracking-[0.3em] px-4 mb-2 flex items-center gap-3">
-                <span className="w-8 h-px bg-primary-600"></span>
-                AKUN & KEAMANAN
-              </div>
-              <div className="grid gap-3">
-                {accountActions.map((action, index) => (
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col bg-white">
+          <div className="px-6 py-6 space-y-8">
+            {/* Primary Navigation Section */}
+            <div>
+              <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-4 mb-4">Navigasi Utama</div>
+              <div className="space-y-3">
+                {mainActions.map((action, index) => (
                   <button
                     key={index}
                     onClick={() => handleAction(action)}
-                    className="w-full flex items-center gap-4 p-4 rounded-3xl bg-gray-50/50 hover:bg-white border border-gray-100 transition-all group active:scale-95"
-                    style={{ 
-                      transitionDelay: `${isOpen ? (index + mainActions.length) * 50 : 0}ms`,
-                      opacity: isOpen ? 1 : 0,
-                      transform: isOpen ? 'translateX(0)' : 'translateX(-40px)'
-                    }}
+                    className="w-full flex items-center gap-5 p-4 rounded-[2rem] bg-gray-50 hover:bg-white hover:shadow-xl hover:shadow-gray-200/40 transition-all border border-gray-100 group active:scale-95"
                   >
-                    <div className={`w-12 h-12 ${action.color} rounded-2xl flex items-center justify-center text-white shadow-md ${action.shadow}`}>
+                    <div className={`w-14 h-14 shrink-0 ${action.color} rounded-[1.25rem] flex items-center justify-center text-white shadow-xl shadow-gray-200 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
                       {action.icon}
                     </div>
-                    <div className="text-left">
-                      <div className="text-sm font-bold text-gray-700 group-hover:text-gray-900">{action.label}</div>
-                      <div className="text-[9px] text-gray-500 font-medium">{action.desc}</div>
+                    <div className="text-left flex-1 min-w-0">
+                      <div className="text-sm font-black text-gray-900 group-hover:text-primary-600 transition-colors truncate">{action.label}</div>
+                      <div className="text-[10px] text-gray-500 font-bold mt-1 line-clamp-2 leading-relaxed">{action.desc}</div>
                     </div>
+                    <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-primary-600 group-hover:translate-x-1 transition-all shrink-0" />
                   </button>
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Menu Footer */}
-          <div className="p-10 border-t border-gray-100 bg-white">
+            {/* Account Section */}
             <div className="space-y-4">
-              <p className="text-[10px] font-black text-gray-400 text-center uppercase tracking-[0.2em] leading-relaxed">
-                Butuh bantuan teknis? <br/>
-                <span className="text-primary-600 cursor-pointer hover:underline">Hubungi Support Admin</span>
-              </p>
-              <div className="flex justify-center gap-4">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <div className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Sistem Online</div>
-              </div>
+               <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-4">Pengaturan</div>
+               <div className="grid grid-cols-2 gap-3">
+                  {accountActions.map((action, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleAction(action)}
+                      className="flex flex-col items-center gap-3 p-4 rounded-3xl bg-gray-50 border border-transparent hover:border-gray-200 hover:bg-white hover:shadow-lg transition-all group"
+                    >
+                      <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center text-gray-400 group-hover:text-primary-600 shadow-sm transition-all border border-gray-100">
+                        {action.icon}
+                      </div>
+                      <span className="text-[10px] font-black text-gray-700 group-hover:text-primary-700">{action.label}</span>
+                    </button>
+                  ))}
+               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Navbar Integrated Hamburger Trigger - Enhanced Clarity */}
+        {/* Panel Footer: Logout & Version */}
+        <div className="p-6 border-t border-gray-100 bg-white shrink-0 mt-auto">
+           <button 
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all group mb-4 font-black text-xs uppercase tracking-widest active:scale-95"
+           >
+              <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Keluar Akun
+           </button>
+           <div className="flex items-center justify-center text-[9px] font-black text-gray-300 uppercase tracking-widest gap-2">
+              <span>© Lampung Cerdas</span>
+              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+              <span>v2.4</span>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="xl:hidden relative flex items-center">
+      {/* Navbar Integrated Hamburger Trigger - High Visibility */}
       <button
         onClick={toggleMenu}
-        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group ${isOpen ? 'opacity-0' : 'bg-gray-100 text-gray-900 border border-gray-200 shadow-md hover:bg-gray-200 active:scale-90'}`}
+        aria-label="Open Menu"
+        className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 group shadow-md ${isOpen ? 'opacity-0 scale-90' : 'bg-primary-600 text-white hover:bg-primary-700 active:scale-95 border border-primary-500'}`}
       >
         <div className="flex flex-col gap-1 items-center">
-          <span className={`h-0.5 bg-gray-900 rounded-full transition-all duration-300 ${isOpen ? 'w-0' : 'w-5'}`}></span>
-          <span className={`h-0.5 bg-primary-600 rounded-full transition-all duration-300 delay-75 ${isOpen ? 'w-0' : 'w-3'}`}></span>
-          <span className={`h-0.5 bg-gray-900 rounded-full transition-all duration-300 delay-150 ${isOpen ? 'w-0' : 'w-5'}`}></span>
+          <span className="h-0.5 bg-white rounded-full transition-all duration-300 w-5 group-hover:w-4"></span>
+          <span className="h-0.5 bg-white rounded-full transition-all duration-300 w-3 group-hover:w-5"></span>
+          <span className="h-0.5 bg-white rounded-full transition-all duration-300 w-5 group-hover:w-4"></span>
         </div>
       </button>
+
+      {/* Render overlay via Portal to escape stacking context issues */}
+      {typeof document !== 'undefined' ? createPortal(menuOverlay, document.body) : menuOverlay}
     </div>
-
-
   );
 }
