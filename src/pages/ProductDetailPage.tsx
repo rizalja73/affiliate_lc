@@ -16,6 +16,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import Button from '../components/Button';
 import Sidebar from '../components/Sidebar';
+import FloatingActionMenu from '../components/FloatingActionMenu';
 import ProfileDropdown from '../components/ProfileDropdown';
 import PackageCheck from '../components/PackageCheck';
 
@@ -135,7 +136,8 @@ export default function ProductDetailPage() {
           <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-10 py-5">
             <div className="max-w-6xl mx-auto flex items-center justify-between">
                <div className="flex items-center gap-5">
-                  <button onClick={() => navigate('/products')} className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary-600 transition-all shadow-sm">
+                  <FloatingActionMenu />
+                  <button onClick={() => navigate('/products')} className="hidden xl:flex p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary-600 transition-all shadow-sm">
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                   <h1 className="text-xl font-black text-gray-900 tracking-tight">Rincian Produk</h1>

@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import ProfileDropdown from '../components/ProfileDropdown';
+import FloatingActionMenu from '../components/FloatingActionMenu';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import Button from '../components/Button';
@@ -207,9 +208,10 @@ export default function ProfilePage() {
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 lg:px-10 py-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
             <div className="flex items-center gap-4">
+              <FloatingActionMenu />
               <button 
                 onClick={() => navigate(-1)}
-                className="flex items-center justify-center w-10 h-10 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all border border-gray-100 bg-white"
+                className="hidden xl:flex items-center justify-center w-10 h-10 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all border border-gray-100 bg-white"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
